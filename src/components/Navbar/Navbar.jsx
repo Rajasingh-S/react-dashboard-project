@@ -33,7 +33,7 @@ const Navbar = () => {
         </div>
         <nav className="nav-menu">
           <Link to="/" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
-            Dashboard
+            Assessment Data
           </Link>
           <Link to="/institutions" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
             Institutions
