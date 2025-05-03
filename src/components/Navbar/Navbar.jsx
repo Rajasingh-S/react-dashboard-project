@@ -35,9 +35,7 @@ const Navbar = () => {
           <Link to="/" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
             Assessment Data
           </Link>
-          <Link to="/institutions" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
-            Institutions
-          </Link>
+          
         </nav>
       </div>
     </>
