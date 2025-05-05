@@ -1,5 +1,5 @@
 import { Bar } from 'react-chartjs-2';
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { getRandomColorFromScheme } from './chartUtils';
 
 ChartJS.register(
   CategoryScale,
@@ -20,6 +21,7 @@ ChartJS.register(
 );
 
 const SelfInterestChart = ({ data }) => {
+  const theme = useTheme();
   const interestedData = data.filter(item => 
     item['Self-Interested Candidate']?.toString().toLowerCase() === 'yes'
   ).sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
@@ -30,15 +32,11 @@ const SelfInterestChart = ({ data }) => {
       {
         label: 'Score',
         data: interestedData.map(item => item['Overall Percentage']),
-        backgroundColor: interestedData.map(item => 
-          item.Status?.toLowerCase().includes('qualif') && !item.Status?.toLowerCase().includes('not') 
-            ? 'rgba(75, 192, 192, 0.8)' 
-            : 'rgba(255, 99, 132, 0.8)'
+        backgroundColor: interestedData.map((_, index) => 
+          getRandomColorFromScheme(index)
         ),
-        borderColor: interestedData.map(item => 
-          item.Status?.toLowerCase().includes('qualif') && !item.Status?.toLowerCase().includes('not') 
-            ? 'rgba(75, 192, 192, 1)' 
-            : 'rgba(255, 99, 132, 1)'
+        borderColor: interestedData.map((_, index) => 
+          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
         ),
         borderWidth: 1,
         borderRadius: 4,
@@ -56,6 +54,12 @@ const SelfInterestChart = ({ data }) => {
         display: false,
       },
       tooltip: {
+        backgroundColor: theme.palette.background.paper,
+        titleColor: theme.palette.text.primary,
+        bodyColor: theme.palette.text.secondary,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
+        padding: 12,
         callbacks: {
           label: (context) => {
             const dataItem = interestedData[context.dataIndex];
@@ -67,13 +71,6 @@ const SelfInterestChart = ({ data }) => {
               `Self-Interested: Yes`
             ];
           }
-        },
-        bodyFont: {
-          size: 14
-        },
-        titleFont: {
-          size: 16,
-          weight: 'bold'
         }
       }
     },
@@ -82,29 +79,33 @@ const SelfInterestChart = ({ data }) => {
         beginAtZero: true,
         max: 100,
         grid: {
-          display: false
+          color: theme.palette.divider,
+          drawBorder: false
         },
         ticks: {
-          font: {
-            size: 12
-          }
+          color: theme.palette.text.secondary
         },
         title: {
           display: true,
           text: 'Score (%)',
+          color: theme.palette.text.primary,
           font: {
-            size: 14,
+            family: theme.typography.fontFamily,
+            size: 12,
             weight: 'bold'
           }
         }
       },
       x: {
         grid: {
-          display: false
+          display: false,
+          drawBorder: false
         },
         ticks: {
+          color: theme.palette.text.secondary,
           font: {
-            size: 12
+            family: theme.typography.fontFamily,
+            size: 11
           }
         }
       }
@@ -113,14 +114,23 @@ const SelfInterestChart = ({ data }) => {
 
   return (
     <Box sx={{ 
-      height: '100%', 
+      height: '100%',
       width: '100%',
       position: 'relative',
+      padding: 2,
       '& canvas': {
         maxHeight: '100%'
       }
     }}>
-      <Bar data={chartData} options={options} />
+      <Bar 
+        data={chartData} 
+        options={options} 
+        style={{ 
+          width: '100%',
+          height: '100%',
+          minHeight: '400px'
+        }}
+      />
     </Box>
   );
 };

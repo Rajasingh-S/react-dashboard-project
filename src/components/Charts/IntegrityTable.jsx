@@ -9,11 +9,13 @@ import {
   Paper,
   Typography,
   TableSortLabel,
-  Tooltip
+  Tooltip,
+  useTheme
 } from '@mui/material';
 import { useState } from 'react';
 
 const IntegrityTable = ({ data }) => {
+  const theme = useTheme();
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('Integrity Score (out of 10)');
 
@@ -35,23 +37,30 @@ const IntegrityTable = ({ data }) => {
       height: '100%',
       overflow: 'auto',
       borderRadius: 2,
-      border: '1px solid #e0e0e0'
+      border: `1px solid ${theme.palette.divider}`,
+      backgroundColor: theme.palette.background.paper
     }}>
-      <TableContainer component={Paper} sx={{ 
-        maxHeight: '100%',
-        boxShadow: 'none',
-        '& .MuiTableCell-root': {
-          py: 1.5,
-          px: 2
-        }
-      }}>
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          maxHeight: '100%',
+          boxShadow: 'none',
+          backgroundColor: 'transparent',
+          '& .MuiTableCell-root': {
+            py: 1.5,
+            px: 2,
+            fontFamily: theme.typography.fontFamily
+          }
+        }}
+      >
         <Table stickyHeader size="small" aria-label="integrity scores table">
           <TableHead>
             <TableRow>
               <TableCell sx={{ 
-                backgroundColor: '#f5f5f5',
+                backgroundColor: theme.palette.grey[100],
                 fontWeight: 600,
-                minWidth: 200
+                minWidth: 200,
+                color: theme.palette.text.primary
               }}>
                 <TableSortLabel
                   active={orderBy === 'Name'}
@@ -61,11 +70,15 @@ const IntegrityTable = ({ data }) => {
                   Employee Name
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" sx={{ 
-                backgroundColor: '#f5f5f5',
-                fontWeight: 600,
-                minWidth: 150
-              }}>
+              <TableCell 
+                align="right" 
+                sx={{ 
+                  backgroundColor: theme.palette.grey[100],
+                  fontWeight: 600,
+                  minWidth: 150,
+                  color: theme.palette.text.primary
+                }}
+              >
                 <TableSortLabel
                   active={orderBy === 'Integrity Score (out of 10)'}
                   direction={orderBy === 'Integrity Score (out of 10)' ? order : 'asc'}
@@ -74,11 +87,15 @@ const IntegrityTable = ({ data }) => {
                   Integrity Score
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" sx={{ 
-                backgroundColor: '#f5f5f5',
-                fontWeight: 600,
-                minWidth: 180
-              }}>
+              <TableCell 
+                align="right" 
+                sx={{ 
+                  backgroundColor: theme.palette.grey[100],
+                  fontWeight: 600,
+                  minWidth: 180,
+                  color: theme.palette.text.primary
+                }}
+              >
                 <TableSortLabel
                   active={orderBy === 'Time Spent Offtab (in secs)'}
                   direction={orderBy === 'Time Spent Offtab (in secs)' ? order : 'asc'}
@@ -96,11 +113,15 @@ const IntegrityTable = ({ data }) => {
               <TableRow 
                 key={index}
                 sx={{ 
-                  '&:nth-of-type(odd)': { backgroundColor: '#fafafa' },
-                  '&:hover': { backgroundColor: '#f5f5f5' }
+                  '&:nth-of-type(odd)': { 
+                    backgroundColor: theme.palette.grey[50] 
+                  },
+                  '&:hover': { 
+                    backgroundColor: theme.palette.action.hover 
+                  }
                 }}
               >
-                <TableCell sx={{ fontWeight: 500 }}>
+                <TableCell sx={{ fontWeight: 500, color: theme.palette.text.primary }}>
                   {row.Name}
                 </TableCell>
                 <TableCell align="right">
@@ -110,15 +131,15 @@ const IntegrityTable = ({ data }) => {
                     py: 0.5,
                     borderRadius: 1,
                     backgroundColor: row['Integrity Score (out of 10)'] >= 8 
-                      ? 'rgba(56, 142, 60, 0.1)' 
+                      ? theme.palette.success.light 
                       : row['Integrity Score (out of 10)'] >= 5 
-                        ? 'rgba(255, 152, 0, 0.1)' 
-                        : 'rgba(244, 67, 54, 0.1)',
+                        ? theme.palette.warning.light 
+                        : theme.palette.error.light,
                     color: row['Integrity Score (out of 10)'] >= 8 
-                      ? '#388e3c' 
+                      ? theme.palette.success.dark 
                       : row['Integrity Score (out of 10)'] >= 5 
-                        ? '#f57c00' 
-                        : '#d32f2f',
+                        ? theme.palette.warning.dark 
+                        : theme.palette.error.dark,
                     fontWeight: 600
                   }}>
                     {row['Integrity Score (out of 10)']}/10
@@ -131,11 +152,11 @@ const IntegrityTable = ({ data }) => {
                     py: 0.5,
                     borderRadius: 1,
                     backgroundColor: row['Time Spent Offtab (in secs)'] > 0 
-                      ? 'rgba(244, 67, 54, 0.1)' 
-                      : 'rgba(56, 142, 60, 0.1)',
+                      ? theme.palette.error.light 
+                      : theme.palette.success.light,
                     color: row['Time Spent Offtab (in secs)'] > 0 
-                      ? '#d32f2f' 
-                      : '#388e3c',
+                      ? theme.palette.error.dark 
+                      : theme.palette.success.dark,
                     fontWeight: 600
                   }}>
                     {row['Time Spent Offtab (in secs)'] > 0 
