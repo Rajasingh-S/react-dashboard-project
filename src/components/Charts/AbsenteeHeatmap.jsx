@@ -26,43 +26,33 @@ const AbsenteeHeatmap = ({ data }) => {
 
   // Calculate absentee counts by manager
   const absenteeData = data.reduce((acc, item) => {
-    const manager = item.Manager || 'Unknown';
+    const manager = item.Manager?.trim() || 'Unknown';
     const isAbsent = item['Attendance Status (Present?)']?.toString().toLowerCase() === 'no';
     
     if (!acc[manager]) {
-      acc[manager] = 0;
+      acc[manager] = { count: 0, total: 0 };
     }
+    acc[manager].total++;
     if (isAbsent) {
-      acc[manager]++;
+      acc[manager].count++;
     }
     return acc;
   }, {});
 
   // Sort managers by absentee count (descending)
   const sortedManagers = Object.keys(absenteeData).sort(
-    (a, b) => absenteeData[b] - absenteeData[a]
+    (a, b) => absenteeData[b].count - absenteeData[a].count
   );
 
-  // Enhanced tooltip data
-  const getTooltipData = (manager) => {
-    const managerData = data.filter(item => (item.Manager || 'Unknown') === manager);
-    const presentCount = managerData.filter(item => 
-      item['Attendance Status (Present?)']?.toString().toLowerCase() === 'yes'
-    ).length;
-    
-    return {
-      total: managerData.length,
-      present: presentCount,
-      rate: Math.round((absenteeData[manager] / managerData.length) * 100)
-    };
-  };
+  // Get max count for scaling
+  const maxCount = Math.max(...Object.values(absenteeData).map(item => item.count));
 
   // Prepare chart data
   const chartData = {
     labels: sortedManagers,
     datasets: [{
       label: 'Number of Absentees',
-      data: sortedManagers.map(manager => absenteeData[manager]),
+      data: sortedManagers.map(manager => absenteeData[manager].count),
       backgroundColor: sortedManagers.map((_, index) => 
         interpolateCool(index / (sortedManagers.length * 1.2))
       ),
@@ -119,15 +109,16 @@ const AbsenteeHeatmap = ({ data }) => {
         },
         callbacks: {
           title: (context) => {
-            return [`${context[0].label}`];
+            return [`Manager: ${context[0].label}`];
           },
           label: (context) => {
-            const tooltipData = getTooltipData(context[0].label);
+            const managerData = absenteeData[context[0].label];
+            const percentage = Math.round((managerData.count / managerData.total) * 100);
             return [
               `Absent: ${context.raw}`,
-              `Present: ${tooltipData.present}`,
-              `Total: ${tooltipData.total}`,
-              `Absentee Rate: ${tooltipData.rate}%`
+              `Present: ${managerData.total - managerData.count}`,
+              `Total: ${managerData.total}`,
+              `Absentee Rate: ${percentage}%`
             ];
           },
           footer: () => ['Click for employee details']
@@ -144,7 +135,8 @@ const AbsenteeHeatmap = ({ data }) => {
         ticks: {
           color: theme.palette.text.secondary,
           font: {
-            family: theme.typography.fontFamily
+            family: theme.typography.fontFamily,
+            size: 12
           }
         },
         title: {
@@ -161,6 +153,7 @@ const AbsenteeHeatmap = ({ data }) => {
       },
       y: {
         beginAtZero: true,
+        max: Math.ceil(maxCount * 1.1), // Add 10% padding to max value
         grid: {
           color: theme.palette.divider,
           drawBorder: false,
@@ -170,7 +163,13 @@ const AbsenteeHeatmap = ({ data }) => {
           color: theme.palette.text.secondary,
           precision: 0,
           font: {
-            family: theme.typography.fontFamily
+            family: theme.typography.fontFamily,
+            size: 12
+          },
+          callback: (value) => {
+            if (value === 0) return '0';
+            if (value === Math.ceil(maxCount)) return maxCount;
+            return value;
           }
         },
         title: {
@@ -211,11 +210,9 @@ const AbsenteeHeatmap = ({ data }) => {
         const xPos = bar.x;
         const yPos = bar.y - 8;
         
-        // Text shadow for better visibility
-        ctx.shadowColor = theme.palette.background.paper;
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
+        // Draw text background for better visibility
+        ctx.fillStyle = theme.palette.background.paper;
+        ctx.fillRect(xPos - 15, yPos - 20, 30, 20);
         
         ctx.fillStyle = theme.palette.text.primary;
         ctx.fillText(value, xPos, yPos);
@@ -232,18 +229,39 @@ const AbsenteeHeatmap = ({ data }) => {
     >
       <Box sx={{ 
         width: '100%',
-        height: '500px',
+        height: 'calc(100vh - 200px)',
         position: 'relative',
         padding: '15px',
         background: theme.palette.background.paper,
         borderRadius: '12px',
-        boxShadow: theme.shadows[2]
+        boxShadow: theme.shadows[2],
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '8px'
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: theme.palette.mode === 'dark' 
+            ? theme.palette.grey[700] 
+            : theme.palette.grey[400],
+          borderRadius: '4px'
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: theme.palette.mode === 'dark' 
+            ? theme.palette.grey[900] 
+            : theme.palette.grey[100]
+        }
       }}>
-        <Bar 
-          data={chartData} 
-          options={options}
-          plugins={[valueLabelPlugin]}
-        />
+        <Box sx={{
+          width: '100%',
+          minHeight: '500px',
+          position: 'relative'
+        }}>
+          <Bar 
+            data={chartData} 
+            options={options}
+            plugins={[valueLabelPlugin]}
+          />
+        </Box>
       </Box>
     </motion.div>
   );
