@@ -1,5 +1,5 @@
 import { Bar } from 'react-chartjs-2';
-import { Box, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,64 +9,63 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { interpolateCool } from 'd3-scale-chromatic';
 import { motion } from 'framer-motion';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const AbsenteeHeatmap = ({ data }) => {
   const theme = useTheme();
 
-  // Calculate absentee counts by manager
   const absenteeData = data.reduce((acc, item) => {
     const manager = item.Manager?.trim() || 'Unknown';
     const isAbsent = item['Attendance Status (Present?)']?.toString().toLowerCase() === 'no';
-    
-    if (!acc[manager]) {
-      acc[manager] = { count: 0, total: 0 };
-    }
+
+    if (!acc[manager]) acc[manager] = { count: 0, total: 0 };
     acc[manager].total++;
-    if (isAbsent) {
-      acc[manager].count++;
-    }
+    if (isAbsent) acc[manager].count++;
     return acc;
   }, {});
 
-  // Sort managers by absentee count (descending)
   const sortedManagers = Object.keys(absenteeData).sort(
     (a, b) => absenteeData[b].count - absenteeData[a].count
   );
 
-  // Get max count for scaling
   const maxCount = Math.max(...Object.values(absenteeData).map(item => item.count));
 
-  // Prepare chart data
+  const getColor = (index) => {
+    const hue = (index * 137.5) % 360;
+    return `hsl(${hue}, 50%, 60%)`;
+  };
+
   const chartData = {
     labels: sortedManagers,
     datasets: [{
       label: 'Number of Absentees',
       data: sortedManagers.map(manager => absenteeData[manager].count),
-      backgroundColor: sortedManagers.map((_, index) => 
-        interpolateCool(index / (sortedManagers.length * 1.2))
-      ),
-      borderColor: theme.palette.mode === 'dark' 
-        ? 'rgba(255, 255, 255, 0.15)' 
-        : 'rgba(0, 0, 0, 0.1)',
+      backgroundColor: sortedManagers.map((_, index) => getColor(index)),
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
       borderWidth: 1.5,
       borderRadius: 6,
+      barThickness: 35,
       hoverBorderWidth: 2,
       hoverBorderColor: theme.palette.error.main,
-      hoverBackgroundColor: sortedManagers.map((_, index) => 
-        interpolateCool(index / (sortedManagers.length * 1.2))
-      )
+      hoverBackgroundColor: sortedManagers.map((_, index) => getColor(index)),
     }]
+  };
+
+  const tooltipCallbacks = {
+    title: (context) => [`Manager: ${context[0].label}`],
+    label: (context) => {
+      const mgrData = absenteeData[context.label];
+      const percentage = Math.round((mgrData.count / mgrData.total) * 100);
+      return [
+        `Absent: ${context.raw}`,
+        `Present: ${mgrData.total - mgrData.count}`,
+        `Total: ${mgrData.total}`,
+        `Absentee Rate: ${percentage}%`
+      ];
+    },
+    footer: () => ['Click for employee details']
   };
 
   const options = {
@@ -75,16 +74,21 @@ const AbsenteeHeatmap = ({ data }) => {
     indexAxis: 'x',
     animation: {
       duration: 1000,
-      easing: 'easeOutBack',
+      easing: 'easeOutQuart',
       delay: (context) => context.dataIndex * 60
     },
+    layout: {
+      padding: {
+        top: 20,
+        right: 30,
+        bottom: 40,
+        left: 20
+      }
+    },
     plugins: {
-      legend: {
-        display: false
-      },
+      legend: { display: false },
       tooltip: {
         enabled: true,
-        position: 'nearest',
         backgroundColor: theme.palette.background.paper,
         titleColor: theme.palette.error.main,
         bodyColor: theme.palette.text.primary,
@@ -107,22 +111,7 @@ const AbsenteeHeatmap = ({ data }) => {
           style: 'italic',
           family: theme.typography.fontFamily
         },
-        callbacks: {
-          title: (context) => {
-            return [`Manager: ${context[0].label}`];
-          },
-          label: (context) => {
-            const managerData = absenteeData[context[0].label];
-            const percentage = Math.round((managerData.count / managerData.total) * 100);
-            return [
-              `Absent: ${context.raw}`,
-              `Present: ${managerData.total - managerData.count}`,
-              `Total: ${managerData.total}`,
-              `Absentee Rate: ${percentage}%`
-            ];
-          },
-          footer: () => ['Click for employee details']
-        },
+        callbacks: tooltipCallbacks,
         displayColors: false
       }
     },
@@ -136,8 +125,10 @@ const AbsenteeHeatmap = ({ data }) => {
           color: theme.palette.text.secondary,
           font: {
             family: theme.typography.fontFamily,
-            size: 12
-          }
+            size: 12,
+            weight: 'bold'
+          },
+          padding: 8
         },
         title: {
           display: true,
@@ -148,12 +139,12 @@ const AbsenteeHeatmap = ({ data }) => {
             weight: 'bold',
             family: theme.typography.fontFamily
           },
-          padding: { top: 15, bottom: 10 }
+          padding: { top: 15 }
         }
       },
       y: {
         beginAtZero: true,
-        max: Math.ceil(maxCount * 1.1), // Add 10% padding to max value
+        max: Math.ceil(maxCount * 1.1),
         grid: {
           color: theme.palette.divider,
           drawBorder: false,
@@ -166,11 +157,7 @@ const AbsenteeHeatmap = ({ data }) => {
             family: theme.typography.fontFamily,
             size: 12
           },
-          callback: (value) => {
-            if (value === 0) return '0';
-            if (value === Math.ceil(maxCount)) return maxCount;
-            return value;
-          }
+          padding: 6
         },
         title: {
           display: true,
@@ -181,25 +168,19 @@ const AbsenteeHeatmap = ({ data }) => {
             weight: 'bold',
             family: theme.typography.fontFamily
           },
-          padding: { bottom: 15 }
+          padding: { bottom: 10 }
         }
       }
     },
     onHover: (event, chartElement) => {
-      if (chartElement.length) {
-        event.native.target.style.cursor = 'pointer';
-      } else {
-        event.native.target.style.cursor = 'default';
-      }
+      event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
     }
   };
 
-  // Custom plugin for value labels
-  const valueLabelPlugin = {
+  const valueLabelsPlugin = {
     id: 'valueLabels',
     afterDatasetsDraw(chart) {
-      const { ctx, data, chartArea: { top, bottom, left, right } } = chart;
-      
+      const { ctx, data } = chart;
       ctx.save();
       ctx.font = `bold 12px ${theme.typography.fontFamily}`;
       ctx.textAlign = 'center';
@@ -207,16 +188,17 @@ const AbsenteeHeatmap = ({ data }) => {
 
       chart.getDatasetMeta(0).data.forEach((bar, index) => {
         const value = data.datasets[0].data[index];
-        const xPos = bar.x;
-        const yPos = bar.y - 8;
-        
-        // Draw text background for better visibility
+        const x = bar.x;
+        const y = bar.y - 10;
+
+        // Background box for better readability
         ctx.fillStyle = theme.palette.background.paper;
-        ctx.fillRect(xPos - 15, yPos - 20, 30, 20);
-        
+        ctx.fillRect(x - 18, y - 20, 36, 18);
+
         ctx.fillStyle = theme.palette.text.primary;
-        ctx.fillText(value, xPos, yPos);
+        ctx.fillText(value, x, y);
       });
+
       ctx.restore();
     }
   };
@@ -225,42 +207,38 @@ const AbsenteeHeatmap = ({ data }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
+      transition={{ duration: 0.5 }}
     >
-      <Box sx={{ 
+      <Box sx={{
         width: '100%',
-        height: 'calc(100vh - 200px)',
-        position: 'relative',
-        padding: '15px',
-        background: theme.palette.background.paper,
-        borderRadius: '12px',
-        boxShadow: theme.shadows[2],
-        overflowY: 'auto',
-        '&::-webkit-scrollbar': {
-          width: '8px'
-        },
+        overflow: 'auto',
+        maxHeight: '80vh',
+        '&::-webkit-scrollbar': { height: '8px', width: '8px' },
         '&::-webkit-scrollbar-thumb': {
-          backgroundColor: theme.palette.mode === 'dark' 
-            ? theme.palette.grey[700] 
-            : theme.palette.grey[400],
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[400],
           borderRadius: '4px'
         },
         '&::-webkit-scrollbar-track': {
-          backgroundColor: theme.palette.mode === 'dark' 
-            ? theme.palette.grey[900] 
-            : theme.palette.grey[100]
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100]
         }
       }}>
-        <Box sx={{
-          width: '100%',
-          minHeight: '500px',
-          position: 'relative'
-        }}>
-          <Bar 
-            data={chartData} 
-            options={options}
-            plugins={[valueLabelPlugin]}
-          />
+        <Box
+          sx={{
+            minWidth: '800px',
+            padding: '25px 20px 40px 10px',
+            background: theme.palette.background.paper,
+            borderRadius: '14px',
+            boxShadow: theme.shadows[2],
+            position: 'relative'
+          }}
+          style={{ height: 'calc(100vh - 200px)' }}
+        >
+          <Bar data={chartData} options={options} plugins={[valueLabelsPlugin]} />
+        </Box>
+        <Box sx={{ p: 2 }}>
+          <Typography variant="body2" align="right" fontWeight="bold" color="text.secondary">
+            Total Managers: {sortedManagers.length}
+          </Typography>
         </Box>
       </Box>
     </motion.div>

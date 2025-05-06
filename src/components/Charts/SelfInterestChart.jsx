@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { getRandomColorFromScheme } from './chartUtils';
 
 ChartJS.register(
@@ -17,30 +18,43 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 );
 
 const SelfInterestChart = ({ data }) => {
   const theme = useTheme();
-  const interestedData = data.filter(item => 
-    item['Self-Interested Candidate']?.toString().toLowerCase() === 'yes'
-  ).sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
+  
+  const interestedData = data
+    .filter(item => item['Self-Interested Candidate']?.toString().toLowerCase() === 'yes')
+    .sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
+
+  const totalScore = interestedData.reduce((sum, item) => sum + (item['Overall Percentage'] || 0), 0);
 
   const chartData = {
     labels: interestedData.map(item => item.Name),
     datasets: [
       {
-        label: 'Score',
+        label: 'Score (%)',
         data: interestedData.map(item => item['Overall Percentage']),
-        backgroundColor: interestedData.map((_, index) => 
-          getRandomColorFromScheme(index)
-        ),
-        borderColor: interestedData.map((_, index) => 
-          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-        ),
+        backgroundColor: interestedData.map((_, index) => getRandomColorFromScheme(index + 5)),
+        borderColor: theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
-        borderRadius: 4,
-        barThickness: 30
+        borderRadius: 6,
+        barThickness: 32,
+        clip: false,  // 💥 This allows labels to go beyond chart area
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: theme.palette.text.primary,
+          font: {
+            weight: 'bold',
+            size: 12,
+          },
+          formatter: (value) => `${value}%`
+        }
       }
     ]
   };
@@ -49,9 +63,21 @@ const SelfInterestChart = ({ data }) => {
     indexAxis: 'x',
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        right: 40,  // 💥 Extra right padding so labels don't get cut
+      },
+    },
+    animation: {
+      duration: 1200,
+      easing: 'easeOutBounce'
+    },
     plugins: {
       legend: {
         display: false,
+      },
+      datalabels: {
+        display: true,
       },
       tooltip: {
         backgroundColor: theme.palette.background.paper,
@@ -75,37 +101,40 @@ const SelfInterestChart = ({ data }) => {
       }
     },
     scales: {
-      y: {
-        beginAtZero: true,
-        max: 100,
-        grid: {
-          color: theme.palette.divider,
-          drawBorder: false
-        },
-        ticks: {
-          color: theme.palette.text.secondary
-        },
-        title: {
-          display: true,
-          text: 'Score (%)',
-          color: theme.palette.text.primary,
-          font: {
-            family: theme.typography.fontFamily,
-            size: 12,
-            weight: 'bold'
-          }
-        }
-      },
       x: {
         grid: {
           display: false,
           drawBorder: false
         },
         ticks: {
-          color: theme.palette.text.secondary,
+          color: theme.palette.text.primary,
           font: {
-            family: theme.typography.fontFamily,
-            size: 11
+            size: 13,
+            weight: 'bold'
+          }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        max: 110,  // 💥 Max Y extended slightly so that 100% labels don't get stuck
+        grid: {
+          color: theme.palette.divider,
+          drawBorder: false
+        },
+        ticks: {
+          color: theme.palette.text.primary,
+          font: {
+            size: 12,
+            weight: 'bold'
+          }
+        },
+        title: {
+          display: true,
+          text: 'Score (%)',
+          color: theme.palette.text.primary,
+          font: {
+            size: 14,
+            weight: 'bold'
           }
         }
       }
@@ -113,24 +142,30 @@ const SelfInterestChart = ({ data }) => {
   };
 
   return (
-    <Box sx={{ 
-      height: '100%',
-      width: '100%',
-      position: 'relative',
-      padding: 2,
-      '& canvas': {
-        maxHeight: '100%'
-      }
-    }}>
-      <Bar 
-        data={chartData} 
-        options={options} 
-        style={{ 
-          width: '100%',
-          height: '100%',
-          minHeight: '400px'
-        }}
-      />
+    <Box 
+      sx={{ 
+        height: '100%',
+        width: '100%',
+        position: 'relative',
+        overflow: 'auto',
+        padding: 2,
+        '& canvas': {
+          minHeight: '400px',
+          maxHeight: '800px',
+          minWidth: '600px'
+        }
+      }}
+    >
+      <Bar data={chartData} options={options} />
+      <Box sx={{
+        mt: 2,
+        textAlign: 'right',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        color: theme.palette.text.secondary
+      }}>
+        Total Combined Score: {totalScore.toFixed(2)}%
+      </Box>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import { Bar } from 'react-chartjs-2';
-import { Box, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,58 +9,41 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { interpolatePlasma } from 'd3-scale-chromatic';
 import { motion } from 'framer-motion';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const ScoreChart = ({ data }) => {
   const theme = useTheme();
-  
-  // Process and sort data
   const sortedData = [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
 
-  // Calculate dimensions
   const barHeight = 30;
-  const chartHeight = Math.max(500, sortedData.length * (barHeight + 10));
+  const chartHeight = Math.max(500, sortedData.length * (barHeight + 15));
   const maxNameLength = Math.max(...sortedData.map(item => item.Name.length));
-  const nameAreaWidth = Math.min(220, maxNameLength * 9);
+  const nameAreaWidth = Math.min(250, maxNameLength * 9);
 
-  // Color generator
   const getColor = (index, total) => {
-    return interpolatePlasma(index / (total * 1.3));
+    const hue = (index * 137.5) % 360;
+    return `hsl(${hue}, 55%, 58%)`; // slight tuning for better visual difference
   };
 
-  // Chart data configuration
   const chartData = {
     labels: sortedData.map(item => item.Name),
     datasets: [{
       label: 'Score',
       data: sortedData.map(item => item['Overall Percentage']),
       backgroundColor: sortedData.map((_, index) => getColor(index, sortedData.length)),
-      borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
       borderWidth: 1.5,
-      borderRadius: 6,
+      borderRadius: 8,
       barThickness: barHeight,
       hoverBorderWidth: 2,
       hoverBorderColor: theme.palette.primary.main,
-      hoverBackgroundColor: sortedData.map((_, index) => getColor(index, sortedData.length))
     }]
   };
 
-  // Enhanced tooltip callback
   const tooltipCallbacks = {
-    title: (context) => {
-      const person = sortedData[context[0].dataIndex];
-      return [`${person.Name}`];
-    },
+    title: (context) => [`${sortedData[context[0].dataIndex].Name}`],
     label: (context) => {
       const person = sortedData[context.dataIndex];
       return [
@@ -71,9 +54,7 @@ const ScoreChart = ({ data }) => {
         `Manager: ${person.Manager || 'N/A'}`
       ];
     },
-    footer: (context) => {
-      return ['Click bar for details'];
-    }
+    footer: () => ['Click bar for details']
   };
 
   const options = {
@@ -81,47 +62,29 @@ const ScoreChart = ({ data }) => {
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 1000,
-      easing: 'easeOutQuart',
-      delay: (context) => context.dataIndex * 50
+      duration: 1200,
+      easing: 'easeOutElastic',
+      delay: (context) => context.dataIndex * 40,
     },
     layout: {
       padding: {
         left: nameAreaWidth,
-        right: 60
+        right: 60,
       }
     },
     plugins: {
-      legend: {
-        display: false
-      },
+      legend: { display: false },
       tooltip: {
         enabled: true,
-        position: 'nearest',
         backgroundColor: theme.palette.background.paper,
         titleColor: theme.palette.primary.main,
         bodyColor: theme.palette.text.primary,
         borderColor: theme.palette.divider,
         borderWidth: 1,
-        padding: 16,
+        padding: 14,
         cornerRadius: 8,
-        boxShadow: theme.shadows[4],
-        titleFont: {
-          size: 14,
-          weight: 'bold',
-          family: theme.typography.fontFamily
-        },
-        bodyFont: {
-          size: 12,
-          family: theme.typography.fontFamily
-        },
-        footerFont: {
-          size: 10,
-          style: 'italic',
-          family: theme.typography.fontFamily
-        },
         callbacks: tooltipCallbacks,
-        displayColors: false
+        displayColors: false,
       }
     },
     scales: {
@@ -132,15 +95,17 @@ const ScoreChart = ({ data }) => {
           color: theme.palette.divider,
           drawBorder: false,
           drawTicks: false,
-          lineWidth: 0.5
+          lineWidth: 0.5,
         },
         ticks: {
           color: theme.palette.text.secondary,
           stepSize: 20,
           callback: (value) => `${value}%`,
-          padding: 8,
+          padding: 10,
           font: {
-            family: theme.typography.fontFamily
+            size: 12,
+            weight: 'bold',
+            family: theme.typography.fontFamily,
           }
         },
         title: {
@@ -148,56 +113,43 @@ const ScoreChart = ({ data }) => {
           text: 'Score Percentage',
           color: theme.palette.text.primary,
           font: {
-            size: 13,
+            size: 14,
             weight: 'bold',
-            family: theme.typography.fontFamily
+            family: theme.typography.fontFamily,
           },
-          padding: { top: 20, bottom: 15 }
+          padding: { top: 20, bottom: 10 },
         }
       },
-      y: {
-        display: false
-      }
+      y: { display: false }
     },
     onHover: (event, chartElement) => {
-      if (chartElement.length) {
-        event.native.target.style.cursor = 'pointer';
-      } else {
-        event.native.target.style.cursor = 'default';
-      }
+      event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
     }
   };
 
-  // Custom plugins
   const externalLabelsPlugin = {
     id: 'externalLabels',
     afterDatasetsDraw(chart) {
-      const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-      
+      const { ctx, chartArea: { left }, scales: { y } } = chart;
       ctx.save();
-      ctx.font = `500 12px ${theme.typography.fontFamily}`;
+      ctx.font = `bold 13px ${theme.typography.fontFamily}`;
       ctx.textBaseline = 'middle';
 
-      // Left aligned names with fade effect
-      ctx.textAlign = 'right';
       chart.data.labels.forEach((label, index) => {
         const yPos = y.getPixelForValue(index);
-        const gradient = ctx.createLinearGradient(left - nameAreaWidth, yPos, left - 10, yPos);
-        gradient.addColorStop(0, 'transparent');
-        gradient.addColorStop(0.8, theme.palette.text.primary);
-        
-        ctx.fillStyle = gradient;
-        ctx.fillText(label, left - 12, yPos);
+
+        // Left: Candidate name
+        ctx.textAlign = 'right';
+        ctx.fillStyle = theme.palette.text.primary;
+        ctx.fillText(label, left - 14, yPos);
+
+        // Right: Score percentage
+        const score = chart.data.datasets[0].data[index];
+        const barEndX = chart.getDatasetMeta(0).data[index].x;
+        ctx.textAlign = 'left';
+        ctx.fillText(`${score}%`, barEndX + 8, yPos);
       });
 
-      // Right aligned percentages
-      ctx.textAlign = 'left';
-      ctx.font = `bold 12px ${theme.typography.fontFamily}`;
-      chart.data.datasets[0].data.forEach((value, index) => {
-        const yPos = y.getPixelForValue(index);
-        ctx.fillStyle = theme.palette.text.primary;
-        ctx.fillText(`${value}%`, right + 12, yPos);
-      });
       ctx.restore();
     }
   };
@@ -208,36 +160,43 @@ const ScoreChart = ({ data }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Box sx={{ 
-        width: '100%',
-        height: `${chartHeight}px`,
-        position: 'relative',
-        overflowY: 'auto',
-        '&::-webkit-scrollbar': {
-          width: '8px'
-        },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[400],
-          borderRadius: '4px'
-        },
-        '&::-webkit-scrollbar-track': {
-          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100]
-        }
-      }}>
-        <Box sx={{
+      <Box
+        sx={{
           width: '100%',
-          minHeight: `${chartHeight}px`,
-          padding: '25px 15px 25px 5px',
-          background: theme.palette.background.paper,
-          borderRadius: '12px',
-          boxShadow: theme.shadows[2]
-        }}>
-          <Bar 
-            data={chartData} 
-            options={options}
-            plugins={[externalLabelsPlugin]}
-            height={chartHeight}
-          />
+          overflow: 'auto',
+          maxHeight: '80vh',
+          '&::-webkit-scrollbar': { height: '8px', width: '8px' },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: theme.palette.mode === 'dark'
+              ? theme.palette.grey[700]
+              : theme.palette.grey[400],
+            borderRadius: '4px'
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: theme.palette.mode === 'dark'
+              ? theme.palette.grey[900]
+              : theme.palette.grey[100]
+          }
+        }}
+      >
+        <Box
+          sx={{
+            minWidth: '800px',
+            padding: '25px 20px 40px 10px',
+            background: theme.palette.background.paper,
+            borderRadius: '14px',
+            boxShadow: theme.shadows[2],
+            position: 'relative'
+          }}
+          style={{ height: `${chartHeight}px` }}
+        >
+          <Bar data={chartData} options={options} plugins={[externalLabelsPlugin]} />
+        </Box>
+
+        <Box sx={{ p: 2 }}>
+          <Typography variant="body2" align="right" fontWeight="bold" color="text.secondary">
+            Total Candidates: {sortedData.length}
+          </Typography>
         </Box>
       </Box>
     </motion.div>

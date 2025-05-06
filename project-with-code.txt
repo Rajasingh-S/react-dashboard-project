@@ -1,0 +1,3091 @@
+### D:\ICANIO intern\React\dashboard-project\src\App.css
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Add smooth transitions for all elements */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+}
+
+
+### D:\ICANIO intern\React\dashboard-project\src\App.jsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar/Navbar';
+import AssessmentData from './pages/Dashboard/AssessmentData';
+
+import './App.css';
+
+function App() {
+  return (
+    <Router>
+      <div className="app-container">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<AssessmentData />} />
+         
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+
+
+### D:\ICANIO intern\React\dashboard-project\src\index.css
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\main.jsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\api\assessmentData.json
+[
+    {
+      "Name": "Jeyachandhini Dhanasekaran",
+      "Email": "jeyachandhini.d@icanio.com",
+      "Date of Invitation": "2025-04-21",
+      "Overall Percentage": 60.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2335276",
+      "Coding - Coding Questions (%)": 60.0,
+      "Coding - Overall (%)": 60.0,
+      "Time Taken (In Seconds)": 2593,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Udhayakumar ",
+      "Current project": "SHP Business Application Tech Support",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-21",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "Yes",
+      "Employee or Intern": "Employee",
+      "Course": "Java"
+    },
+    {
+      "Name": "Ganesaperumal Shanmugavel",
+      "Email": "ganesaperumal.s@icanio.com",
+      "Date of Invitation": "2025-04-21",
+      "Overall Percentage": 46.67,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2335257",
+      "Coding - Coding Questions (%)": 46.67,
+      "Coding - Overall (%)": 46.67,
+      "Time Taken (In Seconds)": 358,
+      "Role": "Intern",
+      "Batch": 1,
+      "Manager": "Prinila Irene ",
+      "Current project": "Raison",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-21",
+      "Attendance Status (Present?)": "No",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Intern",
+      "Course": "Python"
+    },
+    {
+      "Name": "Hariharasudhan Velraj",
+      "Email": "hariharasudhan.v@icanio.com",
+      "Date of Invitation": "2025-04-21",
+      "Overall Percentage": 66.67,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2335211",
+      "Coding - Coding Questions (%)": 66.67,
+      "Coding - Overall (%)": 66.67,
+      "Time Taken (In Seconds)": 1870,
+      "Role": "Intern",
+      "Batch": 1,
+      "Manager": "Prinila Irene",
+      "Current project": "Raison",
+      "Offtab Count": 1,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 6,
+      "Completion Date": "2025-04-21",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "Yes",
+      "Employee or Intern": "Intern",
+      "Course": "Python"
+    },
+    {
+      "Name": "Megha Ganesan",
+      "Email": "megha.g@icanio.com",
+      "Date of Invitation": "2025-04-21",
+      "Overall Percentage": 33.33,
+      "Status": "Not Qualifed",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2335198",
+      "Coding - Coding Questions (%)": 33.33,
+      "Coding - Overall (%)": 33.33,
+      "Time Taken (In Seconds)": 374,
+      "Role": "Intern",
+      "Batch": 1,
+      "Manager": "Prinila Irene ",
+      "Current project": "Jomosoft",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-21",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Intern",
+      "Course": "JavaScript"
+    },
+    {
+      "Name": "Muthuvel Sundaramoorthy",
+      "Email": "muthuvel.s@icanio.com",
+      "Date of Invitation": "2025-04-21",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2335177",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 623,
+      "Role": "Intern",
+      "Batch": 1,
+      "Manager": "Prinila Irene ",
+      "Current project": "Insurance Chatbot",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-21",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Intern",
+      "Course": "C#"
+    },
+    {
+      "Name": "Jackulin Parimalam C",
+      "Email": "jackulin.c@icanio.com",
+      "Date of Invitation": "2025-04-21",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334672",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 2717,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Nishanth",
+      "Current project": "Duco Insure",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-21",
+      "Attendance Status (Present?)": "No",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "C#"
+    },
+    {
+      "Name": "Rajaselvamala",
+      "Email": "rajaselvamala.a@icanio.com",
+      "Date of Invitation": "2025-04-21",
+      "Overall Percentage": 46.67,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334591",
+      "Coding - Coding Questions (%)": 46.67,
+      "Coding - Overall (%)": 46.67,
+      "Time Taken (In Seconds)": 540,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Jenish",
+      "Current project": "Internal Portal",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-21",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "Ruby"
+    },
+    {
+      "Name": "Karthikeyan M",
+      "Email": "karthikeyan.m@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334361",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 520,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Berenice",
+      "Current project": "Plugin Live",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "Ruby"
+    },
+    {
+      "Name": "Mariappan",
+      "Email": "mariappan.n@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 46.67,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334354",
+      "Coding - Coding Questions (%)": 46.67,
+      "Coding - Overall (%)": 46.67,
+      "Time Taken (In Seconds)": 1029,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Berenice",
+      "Current project": "Pluginlive",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "Ruby"
+    },
+    {
+      "Name": "Vignesh Kumaravel",
+      "Email": "vignesh.k@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334341",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 569,
+      "Role": "Intern",
+      "Batch": 1,
+      "Manager": "Prinila Irene",
+      "Current project": "Computer Vision Defence POC",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "No",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Intern",
+      "Course": "Python"
+    },
+    {
+      "Name": "Shamilin Amaladoss",
+      "Email": "shamilin.a@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334332",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 439,
+      "Role": "Intern",
+      "Batch": 1,
+      "Manager": "Prinila Irene",
+      "Current project": "SH POC",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Intern",
+      "Course": "C#"
+    },
+    {
+      "Name": "Shanmuka Nathan Ramachandran",
+      "Email": "shanmukanathan.r@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 60.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334318",
+      "Coding - Coding Questions (%)": 60.0,
+      "Coding - Overall (%)": 60.0,
+      "Time Taken (In Seconds)": 1911,
+      "Role": "Intern",
+      "Batch": 1,
+      "Manager": "Prinila Irene",
+      "Current project": "Computer Vision POC - Defence",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "Yes",
+      "Employee or Intern": "Intern",
+      "Course": "C#"
+    },
+    {
+      "Name": "chinnathurai",
+      "Email": "chinnadhurai@mail.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 0.0,
+      "Status": "Not Qualifed",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334301",
+      "Coding - Coding Questions (%)": 0.0,
+      "Coding - Overall (%)": 0.0,
+      "Time Taken (In Seconds)": 542,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Nishanth",
+      "Current project": "DUCO INSURANCE",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "Yes",
+      "Employee or Intern": "Employee",
+      "Course": "Java"
+    },
+    {
+      "Name": "lingakumar",
+      "Email": "lingakumar.s@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334261",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 742,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Nishanth",
+      "Current project": "Duco",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "Python"
+    },
+    {
+      "Name": "Saraswathi M",
+      "Email": "saraswathi.m@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334255",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 526,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Berenice",
+      "Current project": "ContentStack",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "No",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "Go"
+    },
+    {
+      "Name": "Selva Ananthi Sritharan",
+      "Email": "selvaananthi.s@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334170",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 1175,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Berenice",
+      "Current project": "Travelean",
+      "Offtab Count": 1,
+      "Time Spent Offtab (in secs)": 3,
+      "Integrity Score (out of 10)": 6,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "Yes",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "Python"
+    },
+    {
+      "Name": "Saranya Gomathi Nayagam",
+      "Email": "saranya.g@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2334169",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 1230,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Berenice",
+      "Current project": "Content Stack",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "No",
+      "Self-Interested Candidate": "Yes",
+      "Employee or Intern": "Employee",
+      "Course": "Go"
+    },
+    {
+      "Name": "T E Vijay",
+      "Email": "vijay.e@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 100.0,
+      "Status": "Qualified",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2333504",
+      "Coding - Coding Questions (%)": 100.0,
+      "Coding - Overall (%)": 100.0,
+      "Time Taken (In Seconds)": 965,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Udhayakumar ",
+      "Current project": "SHP - TVT WEB",
+      "Offtab Count": 0,
+      "Time Spent Offtab (in secs)": 0,
+      "Integrity Score (out of 10)": 10,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "No",
+      "Self-Interested Candidate": "No",
+      "Employee or Intern": "Employee",
+      "Course": "Java"
+    },
+    {
+      "Name": "Jacob",
+      "Email": "Jacob.j@icanio.com",
+      "Date of Invitation": "2025-04-19",
+      "Overall Percentage": 4.17,
+      "Status": "Not Qualifed",
+      "Report": "https://icanio.xobin.com/fullreport?iid=2333493",
+      "Coding - Coding Questions (%)": 4.17,
+      "Coding - Overall (%)": 4.17,
+      "Time Taken (In Seconds)": 15,
+      "Role": "Employee",
+      "Batch": 1,
+      "Manager": "Udhayakumar ",
+      "Current project": "SH",
+      "Offtab Count": 1,
+      "Time Spent Offtab (in secs)": 2,
+      "Integrity Score (out of 10)": 5,
+      "Completion Date": "2025-04-19",
+      "Attendance Status (Present?)": "No",
+      "Self-Interested Candidate": "Yes",
+      "Employee or Intern": "Employee",
+      "Course": "JavaScript"
+    }
+  ]
+
+
+### D:\ICANIO intern\React\dashboard-project\src\api\server.js
+import { create } from 'zustand';
+import axios from 'axios';
+
+const useAssessmentStore = create((set) => ({
+  data: [],
+  headers: [],
+  loading: false,
+  error: null,
+  hasData: false,
+  showCharts: false,
+
+  // Actions
+  setData: (newData) => set({ data: newData }),
+  setHeaders: (newHeaders) => set({ headers: newHeaders }),
+  setLoading: (isLoading) => set({ loading: isLoading }),
+  setError: (error) => set({ error }),
+  setHasData: (hasData) => set({ hasData }),
+  clearData: () => set({ data: [], headers: [], hasData: false, showCharts: false }),
+  toggleView: () => set((state) => ({ showCharts: !state.showCharts })),
+
+  fetchDataFromApi: async () => {
+    try {
+      set({ loading: true, error: null });
+      const response = await axios.get('/api/assessment-data');
+      const data = response.data;
+      const headers = data.length > 0 ? Object.keys(data[0]) : [];
+      set({ data, headers, hasData: true, loading: false });
+    } catch (error) {
+      set({ 
+        error: error.response?.data?.message || 'Failed to fetch assessment data',
+        loading: false
+      });
+    }
+  }
+}));
+
+export default useAssessmentStore;
+
+
+### D:\ICANIO intern\React\dashboard-project\src\assets\logo.svg
+<svg width="100" height="35" viewBox="0 0 100 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M37.8396 0L41.8082 6.99016H33.8711L37.8396 0Z" fill="#0D2457"/>
+<path d="M33.8826 6.9895L37.8511 13.9797H29.9141L33.8826 6.9895Z" fill="#0069BB"/>
+<path d="M41.8123 6.9895L45.7808 13.9797H37.8438L41.8123 6.9895Z" fill="#0069BB"/>
+<path d="M45.6873 13.8954L49.6558 20.8855H41.7188L45.6873 13.8954Z" fill="#19BAD8"/>
+<path d="M29.9216 13.8822L33.8905 20.8724H25.9531L29.9216 13.8822Z" fill="#19BAD8"/>
+<path d="M37.8435 13.9753L33.875 6.98511H41.8121L37.8435 13.9753Z" fill="#004D9F"/>
+<path d="M33.8907 20.8724L29.9219 13.8822H37.8592L33.8907 20.8724Z" fill="#008E87"/>
+<path d="M41.7342 20.8724L37.7656 13.8822H45.703L41.7342 20.8724Z" fill="#008E87"/>
+<path d="M0.984375 21.9294V0.802689H3.1322V21.9294H0.984375ZM17.1336 20.1487C18.2494 20.1487 19.3279 19.8972 20.3693 19.3942C21.4107 18.8912 22.2847 18.1769 22.9913 17.2513L24.386 18.7905C23.4376 19.8972 22.3312 20.7523 21.0666 21.3559C19.8021 21.9596 18.4725 22.2614 17.0778 22.2614C15.6831 22.2614 14.3721 21.9797 13.1448 21.4163C11.9361 20.8328 10.8854 20.0582 9.99279 19.0924C9.11878 18.1064 8.42143 16.9495 7.90075 15.6215C7.39865 14.2936 7.14762 12.8751 7.14762 11.366C7.14762 9.85697 7.39865 8.43847 7.90075 7.1105C8.42143 5.76242 9.12807 4.60549 10.0207 3.63968C10.9133 2.65377 11.964 1.87915 13.1727 1.31575C14.3814 0.752374 15.6831 0.470703 17.0778 0.470703C18.5097 0.470703 19.8672 0.772506 21.1503 1.37611C22.4334 1.97975 23.5306 2.83487 24.4418 3.94152L23.0192 5.54108C22.294 4.61554 21.4014 3.8912 20.3414 3.36806C19.2814 2.84493 18.1936 2.58336 17.0778 2.58336C15.9807 2.58336 14.9579 2.81474 14.0095 3.27751C13.0611 3.72018 12.2429 4.33387 11.5548 5.11855C10.8668 5.90325 10.3182 6.83888 9.9091 7.92539C9.51858 8.9918 9.32334 10.1387 9.32334 11.366C9.32334 12.5934 9.51858 13.7503 9.9091 14.8368C10.3182 15.9032 10.8668 16.8288 11.5548 17.6135C12.2429 18.3982 13.0611 19.0219 14.0095 19.4847C14.9765 19.9274 16.0179 20.1487 17.1336 20.1487Z" fill="#00506A"/>
+<path d="M53.8281 0.802689H56.0595L67.4961 18.3076L67.4402 0.802689H69.4766V21.9294H67.5238L55.8083 4.03204L55.8642 21.9294H53.8281V0.802689ZM74.3928 21.9294V0.802689H76.5409V21.9294H74.3928ZM99.9982 11.366C99.9982 12.8751 99.747 14.3036 99.245 15.6517C98.7429 16.9797 98.055 18.1366 97.1808 19.1225C96.3069 20.0883 95.275 20.8529 94.0848 21.4163C92.9131 21.9797 91.6488 22.2614 90.2913 22.2614C88.9523 22.2614 87.6878 21.9797 86.4975 21.4163C85.3073 20.8529 84.2754 20.0883 83.4015 19.1225C82.5273 18.1366 81.8394 16.9797 81.3373 15.6517C80.8353 14.3036 80.5841 12.8751 80.5841 11.366C80.5841 9.85697 80.8353 8.43847 81.3373 7.1105C81.8394 5.76242 82.5273 4.60549 83.4015 3.63968C84.2754 2.65377 85.3073 1.87915 86.4975 1.31575C87.6878 0.752374 88.9523 0.470703 90.2913 0.470703C91.6488 0.470703 92.9131 0.752374 94.0848 1.31575C95.275 1.87915 96.3069 2.65377 97.1808 3.63968C98.055 4.60549 98.7429 5.76242 99.245 7.1105C99.747 8.43847 99.9982 9.85697 99.9982 11.366ZM97.8224 11.366C97.8224 10.1387 97.6273 8.9918 97.2367 7.92539C96.8463 6.83888 96.3162 5.90325 95.6468 5.11855C94.9772 4.33387 94.1776 3.72018 93.2479 3.27751C92.3366 2.81474 91.351 2.58336 90.2913 2.58336C89.2313 2.58336 88.2364 2.81474 87.3066 3.27751C86.3954 3.72018 85.6051 4.33387 84.9355 5.11855C84.2661 5.90325 83.736 6.83888 83.3456 7.92539C82.955 8.9918 82.7599 10.1387 82.7599 11.366C82.7599 12.5934 82.955 13.7503 83.3456 14.8368C83.736 15.9032 84.2661 16.8288 84.9355 17.6135C85.6051 18.3982 86.3954 19.0219 87.3066 19.4847C88.2364 19.9274 89.2313 20.1487 90.2913 20.1487C91.351 20.1487 92.3366 19.9274 93.2479 19.4847C94.1776 19.0219 94.9772 18.3982 95.6468 17.6135C96.3162 16.8288 96.8463 15.9032 97.2367 14.8368C97.6273 13.7503 97.8224 12.5934 97.8224 11.366Z" fill="#00506A"/>
+<path d="M5.90813 26.7575C6.00009 26.7575 6.07435 26.7882 6.13095 26.8492C6.19461 26.9106 6.22645 26.9911 6.22645 27.0903C6.22645 27.1899 6.19461 27.2704 6.13095 27.3314C6.07435 27.385 6.00009 27.4119 5.90813 27.4119H3.71169V34.4496C3.71169 34.5491 3.67986 34.6334 3.61619 34.7022C3.55253 34.7633 3.47471 34.794 3.38275 34.794C3.28372 34.794 3.20238 34.7633 3.13872 34.7022C3.08211 34.6334 3.05381 34.5491 3.05381 34.4496V27.4119H0.857388C0.765426 27.4119 0.687615 27.3812 0.623949 27.3201C0.567358 27.2588 0.539062 27.1783 0.539062 27.079C0.539062 26.987 0.567358 26.9106 0.623949 26.8492C0.687615 26.7882 0.765426 26.7575 0.857388 26.7575H5.90813ZM13.5958 34.1167C13.6878 34.1167 13.762 34.1512 13.8186 34.2201C13.8823 34.2889 13.9141 34.3694 13.9141 34.4612C13.9141 34.5607 13.8823 34.6409 13.8186 34.7022C13.762 34.7633 13.6878 34.794 13.5958 34.794H9.70165C9.60969 34.794 9.53187 34.7633 9.46821 34.7022C9.41161 34.6334 9.38334 34.5491 9.38334 34.4496V27.1019C9.38334 27.0023 9.41161 26.9222 9.46821 26.8608C9.53187 26.7919 9.60969 26.7575 9.70165 26.7575H13.5958C13.6878 26.7575 13.762 26.7919 13.8186 26.8608C13.8823 26.9222 13.9141 27.0023 13.9141 27.1019C13.9141 27.2015 13.8823 27.2816 13.8186 27.343C13.762 27.4044 13.6878 27.4347 13.5958 27.4347H10.0518V30.3166H13.1183C13.2103 30.3166 13.2846 30.351 13.3411 30.4199C13.4048 30.4809 13.4366 30.5614 13.4366 30.661C13.4366 30.7606 13.4048 30.8407 13.3411 30.9021C13.2846 30.9634 13.2103 30.9938 13.1183 30.9938H10.0518V34.1167H13.5958ZM22.64 27.3546C22.7461 27.4235 22.7992 27.519 22.7992 27.6414C22.7992 27.7103 22.7744 27.787 22.7249 27.8712C22.6613 27.9554 22.5799 27.9974 22.4809 27.9974C22.4242 27.9974 22.3677 27.9783 22.3111 27.9401C21.7452 27.5343 21.1262 27.3314 20.4542 27.3314C19.8812 27.3314 19.3613 27.477 18.8944 27.7679C18.4346 28.0588 18.0703 28.468 17.8015 28.9962C17.5398 29.5166 17.4089 30.1099 17.4089 30.7759C17.4089 31.4569 17.5433 32.0615 17.8121 32.5897C18.0809 33.1101 18.4452 33.5159 18.905 33.8068C19.3719 34.0898 19.8883 34.2316 20.4542 34.2316C21.1262 34.2316 21.7416 34.0325 22.3005 33.6346C22.3571 33.5964 22.4172 33.5769 22.4809 33.5769C22.5799 33.5769 22.6613 33.623 22.7249 33.7147C22.7744 33.7761 22.7992 33.8487 22.7992 33.9329C22.7992 34.0554 22.7497 34.1474 22.6506 34.2085C22.3747 34.4076 22.0352 34.5761 21.632 34.7138C21.2288 34.8438 20.8362 34.9089 20.4542 34.9089C19.7822 34.9089 19.1597 34.7367 18.5867 34.3923C18.0208 34.04 17.5681 33.5503 17.2285 32.9226C16.896 32.2951 16.7298 31.5793 16.7298 30.7759C16.7298 30.0028 16.896 29.3024 17.2285 28.6746C17.561 28.0397 18.0102 27.5459 18.5761 27.1936C19.142 26.8339 19.768 26.6542 20.4542 26.6542C20.8503 26.6542 21.2359 26.7155 21.6108 26.838C21.9928 26.9604 22.3358 27.1326 22.64 27.3546ZM31.27 26.7575C31.369 26.7575 31.4468 26.7919 31.5036 26.8608C31.5672 26.9222 31.5991 27.0061 31.5991 27.1135V34.4383C31.5918 34.5454 31.5565 34.6334 31.4929 34.7022C31.4292 34.7633 31.3514 34.794 31.2593 34.794C31.1673 34.794 31.0895 34.7595 31.0258 34.6907C30.9621 34.6218 30.9303 34.5376 30.9303 34.4383V31.017H26.6225V34.4383C26.6154 34.5376 26.58 34.6218 26.5164 34.6907C26.4527 34.7595 26.3749 34.794 26.2829 34.794C26.1839 34.794 26.1025 34.7633 26.0389 34.7022C25.9823 34.6334 25.954 34.5454 25.954 34.4383V27.1135C25.954 27.0061 25.9858 26.9222 26.0495 26.8608C26.1131 26.7919 26.1945 26.7575 26.2935 26.7575C26.3855 26.7575 26.4633 26.7919 26.527 26.8608C26.5906 26.9297 26.6225 27.0139 26.6225 27.1135V30.351H30.9303V27.1135C30.9303 27.0139 30.9621 26.9297 31.0258 26.8608C31.0967 26.7919 31.178 26.7575 31.27 26.7575ZM40.8274 26.7575C40.9194 26.7575 40.99 26.7882 41.0398 26.8492C41.0962 26.9106 41.1245 26.987 41.1245 27.079V34.4267C41.1245 34.5416 41.0927 34.6334 41.029 34.7022C40.9654 34.7633 40.8875 34.794 40.7955 34.794C40.746 34.794 40.6966 34.7827 40.6471 34.7595C40.6045 34.7367 40.5692 34.7098 40.5409 34.6794L35.9889 28.0434V34.484C35.9889 34.5682 35.9571 34.6409 35.8934 34.7022C35.8367 34.7633 35.7696 34.794 35.6917 34.794C35.607 34.794 35.5361 34.7633 35.4796 34.7022C35.4229 34.6409 35.3946 34.5682 35.3946 34.484V27.1019C35.3946 26.9948 35.4229 26.9106 35.4796 26.8492C35.5433 26.7882 35.6174 26.7575 35.7024 26.7575C35.8156 26.7575 35.9004 26.7994 35.9571 26.8837L40.5304 33.5541V27.079C40.5304 26.987 40.5585 26.9106 40.6152 26.8492C40.6717 26.7882 40.7426 26.7575 40.8274 26.7575ZM51.5393 30.7759C51.5393 31.564 51.3874 32.2722 51.0832 32.8997C50.7791 33.5275 50.358 34.0209 49.8204 34.3807C49.283 34.7329 48.671 34.9089 47.9848 34.9089C47.2987 34.9089 46.6867 34.7329 46.149 34.3807C45.6116 34.0209 45.1906 33.5275 44.8865 32.8997C44.5823 32.2722 44.4301 31.564 44.4301 30.7759C44.4301 29.9797 44.5823 29.268 44.8865 28.6402C45.1906 28.0127 45.6116 27.5227 46.149 27.1708C46.6867 26.8189 47.2987 26.6426 47.9848 26.6426C48.671 26.6426 49.283 26.8189 49.8204 27.1708C50.358 27.5227 50.7791 28.0127 51.0832 28.6402C51.3874 29.268 51.5393 29.9797 51.5393 30.7759ZM50.8604 30.7759C50.8604 30.1099 50.7365 29.5166 50.4888 28.9962C50.2484 28.468 49.9089 28.0588 49.4702 27.7679C49.0388 27.477 48.5436 27.3314 47.9848 27.3314C47.4261 27.3314 46.9272 27.477 46.4888 27.7679C46.0573 28.0588 45.7176 28.468 45.4701 28.9962C45.2297 29.5166 45.1093 30.1099 45.1093 30.7759C45.1093 31.4416 45.2297 32.0387 45.4701 32.5669C45.7176 33.0872 46.0573 33.493 46.4888 33.7836C46.9272 34.0745 47.4261 34.2201 47.9848 34.2201C48.5436 34.2201 49.0388 34.0745 49.4702 33.7836C49.9089 33.493 50.2484 33.0872 50.4888 32.5669C50.7365 32.0387 50.8604 31.4416 50.8604 30.7759ZM58.9523 34.1167C59.0443 34.1167 59.1187 34.1474 59.1751 34.2085C59.2388 34.2698 59.2706 34.35 59.2706 34.4496C59.2706 34.5491 59.2388 34.6334 59.1751 34.7022C59.1187 34.7633 59.0443 34.794 58.9523 34.794H55.1643C55.0723 34.794 54.9945 34.7633 54.9308 34.7022C54.8744 34.6334 54.846 34.5491 54.846 34.4496V27.1019C54.846 27.0023 54.8778 26.9222 54.9415 26.8608C55.0052 26.7919 55.0865 26.7575 55.1855 26.7575C55.2775 26.7575 55.3553 26.7919 55.419 26.8608C55.4826 26.9222 55.5145 27.0023 55.5145 27.1019V34.1167H58.9523ZM68.8146 30.7759C68.8146 31.564 68.6627 32.2722 68.3586 32.8997C68.0541 33.5275 67.6334 34.0209 67.0957 34.3807C66.558 34.7329 65.9463 34.9089 65.2602 34.9089C64.5741 34.9089 63.962 34.7329 63.4244 34.3807C62.8867 34.0209 62.4659 33.5275 62.1618 32.8997C61.8577 32.2722 61.7054 31.564 61.7054 30.7759C61.7054 29.9797 61.8577 29.268 62.1618 28.6402C62.4659 28.0127 62.8867 27.5227 63.4244 27.1708C63.962 26.8189 64.5741 26.6426 65.2602 26.6426C65.9463 26.6426 66.558 26.8189 67.0957 27.1708C67.6334 27.5227 68.0541 28.0127 68.3586 28.6402C68.6627 29.268 68.8146 29.9797 68.8146 30.7759ZM68.1357 30.7759C68.1357 30.1099 68.0119 29.5166 67.7642 28.9962C67.5237 28.468 67.1843 28.0588 66.7456 27.7679C66.3141 27.477 65.819 27.3314 65.2602 27.3314C64.7014 27.3314 64.2025 27.477 63.7641 27.7679C63.3323 28.0588 62.9929 28.468 62.7452 28.9962C62.5047 29.5166 62.3846 30.1099 62.3846 30.7759C62.3846 31.4416 62.5047 32.0387 62.7452 32.5669C62.9929 33.0872 63.3323 33.493 63.7641 33.7836C64.2025 34.0745 64.7014 34.2201 65.2602 34.2201C65.819 34.2201 66.3141 34.0745 66.7456 33.7836C67.1843 33.493 67.5237 33.0872 67.7642 32.5669C68.0119 32.0387 68.1357 31.4416 68.1357 30.7759ZM77.5434 30.7415C77.6355 30.7415 77.7095 30.7759 77.7663 30.8448C77.8299 30.9058 77.8617 30.9863 77.8617 31.0859V33.8525C77.8617 33.9827 77.8088 34.0861 77.7026 34.1628C77.3843 34.3998 77.0307 34.5836 76.6414 34.7138C76.2525 34.8438 75.8564 34.9089 75.453 34.9089C74.7315 34.9089 74.0807 34.7289 73.5008 34.3694C72.9206 34.0097 72.4643 33.5159 72.1318 32.8881C71.7996 32.2606 71.6332 31.5565 71.6332 30.7759C71.6332 29.995 71.7996 29.2908 72.1318 28.6634C72.4643 28.0356 72.9206 27.5421 73.5008 27.1824C74.0807 26.8226 74.7315 26.6426 75.453 26.6426C75.828 26.6426 76.1889 26.6924 76.5352 26.7919C76.8891 26.8915 77.204 27.033 77.4798 27.2168C77.5787 27.2857 77.6282 27.3812 77.6282 27.5036C77.6282 27.6032 77.5964 27.6874 77.5327 27.7563C77.4763 27.8252 77.4089 27.8596 77.3313 27.8596C77.2604 27.8596 77.1968 27.8405 77.1403 27.8023C76.6096 27.4883 76.0473 27.3314 75.453 27.3314C74.8519 27.3314 74.3108 27.4808 73.8296 27.7792C73.3556 28.0779 72.9843 28.4912 72.7154 29.0191C72.4466 29.5397 72.3123 30.1253 72.3123 30.7759C72.3123 31.4262 72.4466 32.0158 72.7154 32.5437C72.9843 33.0644 73.3556 33.4736 73.8296 33.7723C74.3108 34.0707 74.8519 34.2201 75.453 34.2201C75.7574 34.2201 76.0615 34.174 76.3657 34.0823C76.6767 33.9902 76.9528 33.8641 77.1933 33.7034V31.4303H75.5166C75.4249 31.4303 75.347 31.3996 75.2834 31.3382C75.2197 31.2694 75.1879 31.1851 75.1879 31.0859C75.1879 30.9863 75.2197 30.9058 75.2834 30.8448C75.347 30.7759 75.4249 30.7415 75.5166 30.7415H77.5434ZM81.9715 34.4383C81.9643 34.5376 81.929 34.6218 81.8653 34.6907C81.8016 34.7595 81.7238 34.794 81.6318 34.794C81.5328 34.794 81.4515 34.7633 81.3878 34.7022C81.3311 34.6334 81.303 34.5454 81.303 34.4383V27.1135C81.303 27.0061 81.3349 26.9222 81.3985 26.8608C81.4622 26.7919 81.5435 26.7575 81.6425 26.7575C81.7345 26.7575 81.8124 26.7919 81.876 26.8608C81.9397 26.9297 81.9715 27.0139 81.9715 27.1135V34.4383ZM89.972 34.1167C90.064 34.1167 90.1381 34.1512 90.1948 34.2201C90.2584 34.2889 90.2903 34.3694 90.2903 34.4612C90.2903 34.5607 90.2584 34.6409 90.1948 34.7022C90.1381 34.7633 90.064 34.794 89.972 34.794H86.0778C85.9858 34.794 85.9079 34.7633 85.8443 34.7022C85.7878 34.6334 85.7595 34.5491 85.7595 34.4496V27.1019C85.7595 27.0023 85.7878 26.9222 85.8443 26.8608C85.9079 26.7919 85.9858 26.7575 86.0778 26.7575H89.972C90.064 26.7575 90.1381 26.7919 90.1948 26.8608C90.2584 26.9222 90.2903 27.0023 90.2903 27.1019C90.2903 27.2015 90.2584 27.2816 90.1948 27.343C90.1381 27.4044 90.064 27.4347 89.972 27.4347H86.4279V30.3166H89.4945C89.5865 30.3166 89.6606 30.351 89.7173 30.4199C89.781 30.4809 89.8128 30.5614 89.8128 30.661C89.8128 30.7606 89.781 30.8407 89.7173 30.9021C89.6606 30.9634 89.5865 30.9938 89.4945 30.9938H86.4279V34.1167H89.972ZM95.5995 34.9089C95.0902 34.9089 94.6373 34.8172 94.2412 34.6334C93.8522 34.4496 93.4737 34.1628 93.1059 33.7723C93.0211 33.6956 92.9786 33.6039 92.9786 33.4968C92.9786 33.4047 93.0104 33.3208 93.0741 33.2441C93.1447 33.1677 93.2226 33.1292 93.3076 33.1292C93.3924 33.1292 93.4703 33.1677 93.5409 33.2441C94.0927 33.9023 94.7826 34.2316 95.6102 34.2316C96.1195 34.2316 96.5403 34.1014 96.8728 33.8412C97.2122 33.581 97.3821 33.2404 97.3821 32.8192C97.3821 32.4902 97.2973 32.2184 97.1274 32.0042C96.9648 31.7822 96.7489 31.6025 96.4801 31.4647C96.2113 31.327 95.8683 31.1851 95.4511 31.0398C94.9982 30.8942 94.6162 30.7336 94.3048 30.5577C94.0007 30.3817 93.7533 30.1481 93.5623 29.8572C93.3713 29.5588 93.2758 29.1837 93.2758 28.7322C93.2758 28.3265 93.3748 27.9667 93.5727 27.653C93.7779 27.3392 94.0609 27.0944 94.4217 26.9181C94.7895 26.7346 95.2103 26.6426 95.6843 26.6426C96.1158 26.6426 96.5191 26.723 96.8939 26.8837C97.2759 27.0368 97.5803 27.2588 97.8066 27.5496C97.9125 27.6799 97.9658 27.7907 97.9658 27.8825C97.9658 27.9667 97.9305 28.0472 97.8596 28.1236C97.7889 28.1925 97.7111 28.2269 97.626 28.2269C97.5554 28.2269 97.4952 28.2003 97.4457 28.1467C97.2548 27.9019 97.0001 27.7028 96.6818 27.5496C96.3635 27.3965 96.031 27.3201 95.6843 27.3201C95.168 27.3201 94.747 27.4463 94.4217 27.699C94.0962 27.9438 93.9336 28.2807 93.9336 28.7091C93.9336 29.1531 94.0892 29.4937 94.4003 29.7311C94.7117 29.9684 95.1573 30.1863 95.7375 30.3855C96.2396 30.5461 96.65 30.7108 96.9683 30.8792C97.2866 31.0474 97.5447 31.2884 97.7429 31.6025C97.9481 31.9084 98.0505 32.3142 98.0505 32.8192C98.0505 33.2097 97.9443 33.5657 97.7322 33.8869C97.5271 34.201 97.2371 34.4496 96.8621 34.6334C96.4943 34.8172 96.0735 34.9089 95.5995 34.9089Z" fill="#00506A"/>
+</svg>
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Charts\AbsenteeHeatmap.jsx
+import { Bar } from 'react-chartjs-2';
+import { Box, Typography, useTheme } from '@mui/material';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { motion } from 'framer-motion';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const AbsenteeHeatmap = ({ data }) => {
+  const theme = useTheme();
+
+  const absenteeData = data.reduce((acc, item) => {
+    const manager = item.Manager?.trim() || 'Unknown';
+    const isAbsent = item['Attendance Status (Present?)']?.toString().toLowerCase() === 'no';
+
+    if (!acc[manager]) acc[manager] = { count: 0, total: 0 };
+    acc[manager].total++;
+    if (isAbsent) acc[manager].count++;
+    return acc;
+  }, {});
+
+  const sortedManagers = Object.keys(absenteeData).sort(
+    (a, b) => absenteeData[b].count - absenteeData[a].count
+  );
+
+  const maxCount = Math.max(...Object.values(absenteeData).map(item => item.count));
+
+  const getColor = (index) => {
+    const hue = (index * 137.5) % 360;
+    return `hsl(${hue}, 50%, 60%)`;
+  };
+
+  const chartData = {
+    labels: sortedManagers,
+    datasets: [{
+      label: 'Number of Absentees',
+      data: sortedManagers.map(manager => absenteeData[manager].count),
+      backgroundColor: sortedManagers.map((_, index) => getColor(index)),
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+      borderWidth: 1.5,
+      borderRadius: 6,
+      barThickness: 35,
+      hoverBorderWidth: 2,
+      hoverBorderColor: theme.palette.error.main,
+      hoverBackgroundColor: sortedManagers.map((_, index) => getColor(index)),
+    }]
+  };
+
+  const tooltipCallbacks = {
+    title: (context) => [`Manager: ${context[0].label}`],
+    label: (context) => {
+      const mgrData = absenteeData[context.label];
+      const percentage = Math.round((mgrData.count / mgrData.total) * 100);
+      return [
+        `Absent: ${context.raw}`,
+        `Present: ${mgrData.total - mgrData.count}`,
+        `Total: ${mgrData.total}`,
+        `Absentee Rate: ${percentage}%`
+      ];
+    },
+    footer: () => ['Click for employee details']
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'x',
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart',
+      delay: (context) => context.dataIndex * 60
+    },
+    layout: {
+      padding: {
+        top: 20,
+        right: 30,
+        bottom: 40,
+        left: 20
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        backgroundColor: theme.palette.background.paper,
+        titleColor: theme.palette.error.main,
+        bodyColor: theme.palette.text.primary,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
+        padding: 16,
+        cornerRadius: 8,
+        boxShadow: theme.shadows[4],
+        titleFont: {
+          size: 14,
+          weight: 'bold',
+          family: theme.typography.fontFamily
+        },
+        bodyFont: {
+          size: 12,
+          family: theme.typography.fontFamily
+        },
+        footerFont: {
+          size: 10,
+          style: 'italic',
+          family: theme.typography.fontFamily
+        },
+        callbacks: tooltipCallbacks,
+        displayColors: false
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+          drawBorder: false
+        },
+        ticks: {
+          color: theme.palette.text.secondary,
+          font: {
+            family: theme.typography.fontFamily,
+            size: 12,
+            weight: 'bold'
+          },
+          padding: 8
+        },
+        title: {
+          display: true,
+          text: 'Managers',
+          color: theme.palette.text.primary,
+          font: {
+            size: 13,
+            weight: 'bold',
+            family: theme.typography.fontFamily
+          },
+          padding: { top: 15 }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        max: Math.ceil(maxCount * 1.1),
+        grid: {
+          color: theme.palette.divider,
+          drawBorder: false,
+          lineWidth: 0.5
+        },
+        ticks: {
+          color: theme.palette.text.secondary,
+          precision: 0,
+          font: {
+            family: theme.typography.fontFamily,
+            size: 12
+          },
+          padding: 6
+        },
+        title: {
+          display: true,
+          text: 'Number of Absentees',
+          color: theme.palette.text.primary,
+          font: {
+            size: 13,
+            weight: 'bold',
+            family: theme.typography.fontFamily
+          },
+          padding: { bottom: 10 }
+        }
+      }
+    },
+    onHover: (event, chartElement) => {
+      event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
+    }
+  };
+
+  const valueLabelsPlugin = {
+    id: 'valueLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx, data } = chart;
+      ctx.save();
+      ctx.font = `bold 12px ${theme.typography.fontFamily}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+
+      chart.getDatasetMeta(0).data.forEach((bar, index) => {
+        const value = data.datasets[0].data[index];
+        const x = bar.x;
+        const y = bar.y - 10;
+
+        // Background box for better readability
+        ctx.fillStyle = theme.palette.background.paper;
+        ctx.fillRect(x - 18, y - 20, 36, 18);
+
+        ctx.fillStyle = theme.palette.text.primary;
+        ctx.fillText(value, x, y);
+      });
+
+      ctx.restore();
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Box sx={{
+        width: '100%',
+        overflow: 'auto',
+        maxHeight: '80vh',
+        '&::-webkit-scrollbar': { height: '8px', width: '8px' },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[400],
+          borderRadius: '4px'
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100]
+        }
+      }}>
+        <Box
+          sx={{
+            minWidth: '800px',
+            padding: '25px 20px 40px 10px',
+            background: theme.palette.background.paper,
+            borderRadius: '14px',
+            boxShadow: theme.shadows[2],
+            position: 'relative'
+          }}
+          style={{ height: 'calc(100vh - 200px)' }}
+        >
+          <Bar data={chartData} options={options} plugins={[valueLabelsPlugin]} />
+        </Box>
+        <Box sx={{ p: 2 }}>
+          <Typography variant="body2" align="right" fontWeight="bold" color="text.secondary">
+            Total Managers: {sortedManagers.length}
+          </Typography>
+        </Box>
+      </Box>
+    </motion.div>
+  );
+};
+
+export default AbsenteeHeatmap;
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Charts\AttendanceChart.jsx
+import { Bar } from 'react-chartjs-2';
+import { Box, useTheme } from '@mui/material';
+import { motion } from 'framer-motion';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { interpolateViridis } from 'd3-scale-chromatic';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const AttendanceChart = ({ data }) => {
+  const theme = useTheme();
+
+  const attendanceData = data.reduce((acc, item) => {
+    const manager = item.Manager?.trim() || 'Unknown';
+    const isPresent = item['Attendance Status (Present?)']?.toString().toLowerCase() === 'yes';
+    if (!acc[manager]) acc[manager] = { present: 0, total: 0 };
+    acc[manager].total++;
+    if (isPresent) acc[manager].present++;
+    return acc;
+  }, {});
+
+  const sortedManagers = Object.keys(attendanceData).sort(
+    (a, b) => attendanceData[b].present - attendanceData[a].present
+  );
+
+  const maxCount = Math.max(...Object.values(attendanceData).map(item => item.present));
+
+  const chartData = {
+    labels: sortedManagers,
+    datasets: [{
+      label: 'Number of Present Employees',
+      data: sortedManagers.map(manager => attendanceData[manager].present),
+      backgroundColor: sortedManagers.map((_, index) => interpolateViridis(index / sortedManagers.length)),
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      borderWidth: 1.5,
+      borderRadius: 6,
+      hoverBorderWidth: 2,
+      hoverBorderColor: theme.palette.success.main,
+      hoverBackgroundColor: sortedManagers.map((_, index) => interpolateViridis(index / sortedManagers.length))
+    }]
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'x',
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart',
+      delay: (context) => context.dataIndex * 60
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        backgroundColor: theme.palette.background.paper,
+        titleColor: theme.palette.success.main,
+        bodyColor: theme.palette.text.primary,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
+        padding: 16,
+        cornerRadius: 8,
+        titleFont: {
+          size: 14,
+          weight: 'bold',
+          family: theme.typography.fontFamily
+        },
+        bodyFont: {
+          size: 12,
+          family: theme.typography.fontFamily
+        },
+        footerFont: {
+          size: 10,
+          style: 'italic',
+          family: theme.typography.fontFamily
+        },
+        callbacks: {
+          title: (context) => [`Manager: ${context[0].label}`],
+          label: (context) => {
+            const mgrData = attendanceData[context.label];
+            const percentage = Math.round((mgrData.present / mgrData.total) * 100);
+            return [
+              `Present: ${context.raw}`,
+              `Absent: ${mgrData.total - mgrData.present}`,
+              `Total: ${mgrData.total}`,
+              `Attendance Rate: ${percentage}%`
+            ];
+          },
+          footer: () => ['Click for employee details']
+        },
+        displayColors: false
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false, drawBorder: false },
+        ticks: {
+          color: theme.palette.text.secondary,
+          font: {
+            family: theme.typography.fontFamily,
+            size: 12,
+            weight: 'bold'
+          }
+        },
+        title: {
+          display: true,
+          text: 'Managers',
+          color: theme.palette.text.primary,
+          font: {
+            size: 13,
+            weight: 'bold',
+            family: theme.typography.fontFamily
+          },
+          padding: { top: 15, bottom: 10 }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        max: Math.ceil(maxCount * 1.1),
+        grid: {
+          color: theme.palette.divider,
+          drawBorder: false,
+          lineWidth: 0.5
+        },
+        ticks: {
+          color: theme.palette.text.secondary,
+          precision: 0,
+          font: {
+            family: theme.typography.fontFamily,
+            size: 12
+          }
+        },
+        title: {
+          display: true,
+          text: 'Number of Present Employees',
+          color: theme.palette.text.primary,
+          font: {
+            size: 13,
+            weight: 'bold',
+            family: theme.typography.fontFamily
+          },
+          padding: { bottom: 15 }
+        }
+      }
+    },
+    onHover: (event, chartElement) => {
+      event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
+    }
+  };
+
+  const valueLabelPlugin = {
+    id: 'valueLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx, data } = chart;
+      ctx.save();
+      ctx.font = `bold 12px ${theme.typography.fontFamily}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+
+      chart.getDatasetMeta(0).data.forEach((bar, index) => {
+        const value = data.datasets[0].data[index];
+        const x = bar.x;
+        const y = bar.y - 8;
+
+        ctx.fillStyle = theme.palette.background.paper;
+        ctx.fillRect(x - 15, y - 20, 30, 20);
+
+        ctx.fillStyle = theme.palette.text.primary;
+        ctx.fillText(value, x, y);
+      });
+
+      ctx.restore();
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      <Box sx={{
+        width: '100%',
+        height: 'calc(100vh - 200px)',
+        position: 'relative',
+        padding: '15px',
+        background: theme.palette.background.paper,
+        borderRadius: '12px',
+        boxShadow: theme.shadows[2],
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '8px'
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[400],
+          borderRadius: '4px'
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100]
+        }
+      }}>
+        <Box sx={{ width: '100%', minHeight: '500px', position: 'relative' }}>
+          <Bar data={chartData} options={options} plugins={[valueLabelPlugin]} />
+        </Box>
+      </Box>
+    </motion.div>
+  );
+};
+
+export default AttendanceChart;
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Charts\chartUtils.js
+import { schemeCategory10, schemePastel2, schemeSet3 } from 'd3-scale-chromatic';
+
+export const generateUniqueColors = (count, alpha = 0.8) => {
+  const colors = [];
+  const schemes = [schemeCategory10, schemePastel2, schemeSet3];
+  const schemeIndex = Math.floor(Math.random() * schemes.length);
+  
+  for (let i = 0; i < count; i++) {
+    const hue = (i * 360 / count) % 360;
+    const saturation = 70 + Math.random() * 20;
+    const lightness = 50 + Math.random() * 10;
+    colors.push(`hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`);
+  }
+  return colors;
+};
+
+export const getInitials = (name) => {
+  return name.split(' ').map(n => n[0]).join('');
+};
+
+export const getRandomColorFromScheme = (index) => {
+  const schemes = [schemeCategory10, schemePastel2, schemeSet3];
+  const schemeIndex = index % schemes.length;
+  const colorIndex = Math.floor(index / schemes.length) % schemes[schemeIndex].length;
+  return schemes[schemeIndex][colorIndex];
+};
+
+export const getColorForValue = (value, maxValue) => {
+  const ratio = value / maxValue;
+  const hue = (1 - ratio) * 120;
+  return `hsl(${hue}, 70%, 50%)`;
+};
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
+import { useState, useRef } from 'react';
+import { 
+  Box, 
+  Typography,
+  Paper,
+  Avatar,
+  Button,
+  useTheme,
+  IconButton,
+  styled
+} from '@mui/material';
+import { 
+  FiDownload, 
+  FiPieChart,
+  FiChevronLeft,
+  FiChevronRight
+} from 'react-icons/fi';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import ScoreChart from './ScoreChart';
+import SelfInterestChart from './SelfInterestChart';
+import AbsenteeHeatmap from './AbsenteeHeatmap';
+import AttendanceChart from './AttendanceChart';
+import IntegrityTable from './IntegrityTable';
+
+const ChartContainer = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  height: 'calc(100vh - 180px)',
+  overflow: 'hidden',
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[2],
+  backgroundColor: theme.palette.background.paper
+}));
+
+const ChartWrapper = styled(Box)({
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  transition: 'transform 0.3s ease'
+});
+
+const ChartView = ({ data, onToggleView }) => {
+  const theme = useTheme();
+  const [currentChart, setCurrentChart] = useState(0);
+  const chartWrapperRef = useRef(null);
+
+  const charts = [
+    { title: 'Overall Score Distribution', component: <ScoreChart data={data} /> },
+    { title: 'Self Interested Candidates', component: <SelfInterestChart data={data} /> },
+    { title: 'Absentee Analysis by Manager', component: <AbsenteeHeatmap data={data} /> },
+    { title: 'Attendance by Manager', component: <AttendanceChart data={data} /> },
+    { title: 'Integrity Scores', component: <IntegrityTable data={data} /> }
+  ];
+
+  const handleDownloadPDF = async () => {
+    try {
+      const element = document.getElementById(`chart-${currentChart}`);
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        scrollX: 0
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF('landscape', 'pt', [canvas.width, canvas.height]);
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save(`${charts[currentChart].title}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  const navigateChart = (direction) => {
+    const newIndex = direction === 'next' 
+      ? (currentChart + 1) % charts.length 
+      : (currentChart - 1 + charts.length) % charts.length;
+    
+    setCurrentChart(newIndex);
+    chartWrapperRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
+  };
+
+  return (
+    <Box sx={{ p: 3, height: '100vh', overflow: 'hidden' }}>
+      <Box sx={{ 
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 3
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Avatar sx={{ 
+            bgcolor: 'primary.main', 
+            width: 48, 
+            height: 48, 
+            mr: 2 
+          }}>
+            <FiPieChart />
+          </Avatar>
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            {charts[currentChart].title}
+          </Typography>
+        </Box>
+        
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={onToggleView}
+            sx={{ fontWeight: 600 }}
+          >
+            Back to Table
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<FiDownload />}
+            onClick={handleDownloadPDF}
+            sx={{ fontWeight: 600 }}
+          >
+            Export PDF
+          </Button>
+        </Box>
+      </Box>
+
+      <Box sx={{ position: 'relative' }}>
+        <ChartContainer>
+          <ChartWrapper ref={chartWrapperRef}>
+            {charts.map((chart, index) => (
+              <Box 
+                key={index}
+                id={`chart-${index}`}
+                sx={{ 
+                  minWidth: '100%', 
+                  height: '100%',
+                  p: 3,
+                  boxSizing: 'border-box'
+                }}
+              >
+                {chart.component}
+              </Box>
+            ))}
+          </ChartWrapper>
+        </ChartContainer>
+
+        <IconButton
+          onClick={() => navigateChart('prev')}
+          sx={{
+            position: 'absolute',
+            left: 10,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: theme.shadows[2],
+            '&:hover': {
+              backgroundColor: theme.palette.grey[200]
+            }
+          }}
+        >
+          <FiChevronLeft />
+        </IconButton>
+
+        <IconButton
+          onClick={() => navigateChart('next')}
+          sx={{
+            position: 'absolute',
+            right: 10,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: theme.shadows[2],
+            '&:hover': {
+              backgroundColor: theme.palette.grey[200]
+            }
+          }}
+        >
+          <FiChevronRight />
+        </IconButton>
+      </Box>
+
+      <Box sx={{ 
+        display: 'flex',
+        justifyContent: 'center',
+        mt: 2,
+        gap: 1
+      }}>
+        {charts.map((_, index) => (
+          <Box
+            key={index}
+            onClick={() => {
+              setCurrentChart(index);
+              chartWrapperRef.current.style.transform = `translateX(-${index * 100}%)`;
+            }}
+            sx={{
+              width: 10,
+              height: 10,
+              borderRadius: '50%',
+              backgroundColor: currentChart === index 
+                ? theme.palette.primary.main 
+                : theme.palette.grey[400],
+              cursor: 'pointer',
+              transition: 'background-color 0.3s'
+            }}
+          />
+        ))}
+      </Box>
+    </Box>
+  );
+};
+
+export default ChartView;
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Charts\IntegrityTable.jsx
+import { 
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  TableSortLabel,
+  Tooltip,
+  useTheme
+} from '@mui/material';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+
+const IntegrityTable = ({ data }) => {
+  const theme = useTheme();
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('Integrity Score (out of 10)');
+
+  const handleSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    const aValue = a[orderBy] || 0;
+    const bValue = b[orderBy] || 0;
+    return order === 'asc' ? aValue - bValue : bValue - aValue;
+  });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <Box sx={{
+        width: '100%',
+        height: 'calc(100vh - 200px)',
+        overflow: 'auto',
+        borderRadius: 3,
+        border: `1px solid ${theme.palette.divider}`,
+        background: theme.palette.mode === 'dark' ? '#1e1e2f' : '#f0f4ff',
+        boxShadow: theme.shadows[3],
+        '&::-webkit-scrollbar': {
+          width: '8px'
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: theme.palette.primary.light,
+          borderRadius: '4px'
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: theme.palette.background.default
+        }
+      }}>
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxHeight: '100%',
+            boxShadow: 'none',
+            backgroundColor: 'transparent'
+          }}
+        >
+          <Table stickyHeader size="small" aria-label="integrity table">
+            <TableHead>
+              <TableRow>
+                {['Name', 'Integrity Score (out of 10)', 'Time Spent Offtab (in secs)'].map((column, idx) => (
+                  <TableCell
+                    key={column}
+                    align={idx === 0 ? 'left' : 'right'}
+                    sx={{
+                      backgroundColor: theme.palette.primary.light,
+                      color: theme.palette.primary.contrastText,
+                      fontWeight: 'bold',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <TableSortLabel
+                      active={orderBy === column}
+                      direction={orderBy === column ? order : 'asc'}
+                      onClick={() => handleSort(column)}
+                      sx={{
+                        '& .MuiTableSortLabel-icon': {
+                          color: theme.palette.primary.contrastText + ' !important'
+                        }
+                      }}
+                    >
+                      {column === 'Time Spent Offtab (in secs)' ? (
+                        <Tooltip title="Time spent away from assessment">
+                          <span>Off-task Time</span>
+                        </Tooltip>
+                      ) : (
+                        column === 'Name' ? 'Employee Name' : 'Integrity Score'
+                      )}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sortedData.map((row, index) => (
+                <TableRow
+                  key={index}
+                  sx={{
+                    backgroundColor: index % 2 === 0
+                      ? theme.palette.mode === 'dark' ? '#252539' : '#eaf1ff'
+                      : theme.palette.mode === 'dark' ? '#1b1b2c' : '#dbe7ff',
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover
+                    }
+                  }}
+                >
+                  <TableCell sx={{
+                    fontWeight: 500,
+                    color: theme.palette.text.primary,
+                    minWidth: 150
+                  }}>
+                    {row.Name}
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box sx={{
+                      display: 'inline-block',
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 1,
+                      fontSize: '13px',
+                      backgroundColor: row['Integrity Score (out of 10)'] >= 8
+                        ? theme.palette.success.light
+                        : row['Integrity Score (out of 10)'] >= 5
+                          ? theme.palette.warning.light
+                          : theme.palette.error.light,
+                      color: row['Integrity Score (out of 10)'] >= 8
+                        ? theme.palette.success.dark
+                        : row['Integrity Score (out of 10)'] >= 5
+                          ? theme.palette.warning.dark
+                          : theme.palette.error.dark,
+                      fontWeight: 600
+                    }}>
+                      {row['Integrity Score (out of 10)']}/10
+                    </Box>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box sx={{
+                      display: 'inline-block',
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 1,
+                      fontSize: '13px',
+                      backgroundColor: row['Time Spent Offtab (in secs)'] > 0
+                        ? theme.palette.error.light
+                        : theme.palette.success.light,
+                      color: row['Time Spent Offtab (in secs)'] > 0
+                        ? theme.palette.error.dark
+                        : theme.palette.success.dark,
+                      fontWeight: 600
+                    }}>
+                      {row['Time Spent Offtab (in secs)'] > 0
+                        ? `${Math.floor(row['Time Spent Offtab (in secs)']/60)}m ${row['Time Spent Offtab (in secs)']%60}s`
+                        : 'None'}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </motion.div>
+  );
+};
+
+export default IntegrityTable;
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Charts\ScoreChart.jsx
+import { Bar } from 'react-chartjs-2';
+import { Box, Typography, useTheme } from '@mui/material';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { motion } from 'framer-motion';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const ScoreChart = ({ data }) => {
+  const theme = useTheme();
+  const sortedData = [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
+
+  const barHeight = 30;
+  const chartHeight = Math.max(500, sortedData.length * (barHeight + 15));
+  const maxNameLength = Math.max(...sortedData.map(item => item.Name.length));
+  const nameAreaWidth = Math.min(250, maxNameLength * 9);
+
+  const getColor = (index, total) => {
+    const hue = (index * 137.5) % 360;
+    return `hsl(${hue}, 55%, 58%)`; // slight tuning for better visual difference
+  };
+
+  const chartData = {
+    labels: sortedData.map(item => item.Name),
+    datasets: [{
+      label: 'Score',
+      data: sortedData.map(item => item['Overall Percentage']),
+      backgroundColor: sortedData.map((_, index) => getColor(index, sortedData.length)),
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
+      borderWidth: 1.5,
+      borderRadius: 8,
+      barThickness: barHeight,
+      hoverBorderWidth: 2,
+      hoverBorderColor: theme.palette.primary.main,
+    }]
+  };
+
+  const tooltipCallbacks = {
+    title: (context) => [`${sortedData[context[0].dataIndex].Name}`],
+    label: (context) => {
+      const person = sortedData[context.dataIndex];
+      return [
+        `Score: ${context.raw}%`,
+        `Status: ${person.Status}`,
+        `Type: ${person['Employee or Intern']}`,
+        `Course: ${person.Course || 'N/A'}`,
+        `Manager: ${person.Manager || 'N/A'}`
+      ];
+    },
+    footer: () => ['Click bar for details']
+  };
+
+  const options = {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 1200,
+      easing: 'easeOutElastic',
+      delay: (context) => context.dataIndex * 40,
+    },
+    layout: {
+      padding: {
+        left: nameAreaWidth,
+        right: 60,
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        backgroundColor: theme.palette.background.paper,
+        titleColor: theme.palette.primary.main,
+        bodyColor: theme.palette.text.primary,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
+        padding: 14,
+        cornerRadius: 8,
+        callbacks: tooltipCallbacks,
+        displayColors: false,
+      }
+    },
+    scales: {
+      x: {
+        max: 100,
+        min: 0,
+        grid: {
+          color: theme.palette.divider,
+          drawBorder: false,
+          drawTicks: false,
+          lineWidth: 0.5,
+        },
+        ticks: {
+          color: theme.palette.text.secondary,
+          stepSize: 20,
+          callback: (value) => `${value}%`,
+          padding: 10,
+          font: {
+            size: 12,
+            weight: 'bold',
+            family: theme.typography.fontFamily,
+          }
+        },
+        title: {
+          display: true,
+          text: 'Score Percentage',
+          color: theme.palette.text.primary,
+          font: {
+            size: 14,
+            weight: 'bold',
+            family: theme.typography.fontFamily,
+          },
+          padding: { top: 20, bottom: 10 },
+        }
+      },
+      y: { display: false }
+    },
+    onHover: (event, chartElement) => {
+      event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
+    }
+  };
+
+  const externalLabelsPlugin = {
+    id: 'externalLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx, chartArea: { left }, scales: { y } } = chart;
+      ctx.save();
+      ctx.font = `bold 13px ${theme.typography.fontFamily}`;
+      ctx.textBaseline = 'middle';
+
+      chart.data.labels.forEach((label, index) => {
+        const yPos = y.getPixelForValue(index);
+
+        // Left: Candidate name
+        ctx.textAlign = 'right';
+        ctx.fillStyle = theme.palette.text.primary;
+        ctx.fillText(label, left - 14, yPos);
+
+        // Right: Score percentage
+        const score = chart.data.datasets[0].data[index];
+        const barEndX = chart.getDatasetMeta(0).data[index].x;
+        ctx.textAlign = 'left';
+        ctx.fillText(`${score}%`, barEndX + 8, yPos);
+      });
+
+      ctx.restore();
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          overflow: 'auto',
+          maxHeight: '80vh',
+          '&::-webkit-scrollbar': { height: '8px', width: '8px' },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: theme.palette.mode === 'dark'
+              ? theme.palette.grey[700]
+              : theme.palette.grey[400],
+            borderRadius: '4px'
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: theme.palette.mode === 'dark'
+              ? theme.palette.grey[900]
+              : theme.palette.grey[100]
+          }
+        }}
+      >
+        <Box
+          sx={{
+            minWidth: '800px',
+            padding: '25px 20px 40px 10px',
+            background: theme.palette.background.paper,
+            borderRadius: '14px',
+            boxShadow: theme.shadows[2],
+            position: 'relative'
+          }}
+          style={{ height: `${chartHeight}px` }}
+        >
+          <Bar data={chartData} options={options} plugins={[externalLabelsPlugin]} />
+        </Box>
+
+        <Box sx={{ p: 2 }}>
+          <Typography variant="body2" align="right" fontWeight="bold" color="text.secondary">
+            Total Candidates: {sortedData.length}
+          </Typography>
+        </Box>
+      </Box>
+    </motion.div>
+  );
+};
+
+export default ScoreChart;
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Charts\SelfInterestChart.jsx
+import { Bar } from 'react-chartjs-2';
+import { Box, useTheme } from '@mui/material';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { getRandomColorFromScheme } from './chartUtils';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+);
+
+const SelfInterestChart = ({ data }) => {
+  const theme = useTheme();
+  
+  const interestedData = data
+    .filter(item => item['Self-Interested Candidate']?.toString().toLowerCase() === 'yes')
+    .sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
+
+  const totalScore = interestedData.reduce((sum, item) => sum + (item['Overall Percentage'] || 0), 0);
+
+  const chartData = {
+    labels: interestedData.map(item => item.Name),
+    datasets: [
+      {
+        label: 'Score (%)',
+        data: interestedData.map(item => item['Overall Percentage']),
+        backgroundColor: interestedData.map((_, index) => getRandomColorFromScheme(index + 5)),
+        borderColor: theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 1,
+        borderRadius: 6,
+        barThickness: 32,
+        clip: false,  // 💥 This allows labels to go beyond chart area
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: theme.palette.text.primary,
+          font: {
+            weight: 'bold',
+            size: 12,
+          },
+          formatter: (value) => `${value}%`
+        }
+      }
+    ]
+  };
+
+  const options = {
+    indexAxis: 'x',
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: {
+      padding: {
+        right: 40,  // 💥 Extra right padding so labels don't get cut
+      },
+    },
+    animation: {
+      duration: 1200,
+      easing: 'easeOutBounce'
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      datalabels: {
+        display: true,
+      },
+      tooltip: {
+        backgroundColor: theme.palette.background.paper,
+        titleColor: theme.palette.text.primary,
+        bodyColor: theme.palette.text.secondary,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+          label: (context) => {
+            const dataItem = interestedData[context.dataIndex];
+            return [
+              `Score: ${context.raw}%`,
+              `Status: ${dataItem.Status}`,
+              `Course: ${dataItem.Course}`,
+              `Manager: ${dataItem.Manager || 'N/A'}`,
+              `Self-Interested: Yes`
+            ];
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+          drawBorder: false
+        },
+        ticks: {
+          color: theme.palette.text.primary,
+          font: {
+            size: 13,
+            weight: 'bold'
+          }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        max: 110,  // 💥 Max Y extended slightly so that 100% labels don't get stuck
+        grid: {
+          color: theme.palette.divider,
+          drawBorder: false
+        },
+        ticks: {
+          color: theme.palette.text.primary,
+          font: {
+            size: 12,
+            weight: 'bold'
+          }
+        },
+        title: {
+          display: true,
+          text: 'Score (%)',
+          color: theme.palette.text.primary,
+          font: {
+            size: 14,
+            weight: 'bold'
+          }
+        }
+      }
+    }
+  };
+
+  return (
+    <Box 
+      sx={{ 
+        height: '100%',
+        width: '100%',
+        position: 'relative',
+        overflow: 'auto',
+        padding: 2,
+        '& canvas': {
+          minHeight: '400px',
+          maxHeight: '800px',
+          minWidth: '600px'
+        }
+      }}
+    >
+      <Bar data={chartData} options={options} />
+      <Box sx={{
+        mt: 2,
+        textAlign: 'right',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        color: theme.palette.text.secondary
+      }}>
+        Total Combined Score: {totalScore.toFixed(2)}%
+      </Box>
+    </Box>
+  );
+};
+
+export default SelfInterestChart;
+
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Navbar\index.js
+import Navbar from './Navbar';
+export default Navbar;
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Navbar\Navbar.css
+.sidebar {
+  width: 280px;
+  background:linear-gradient(#f4f4f5,#1a73e8);
+  color: #3a4a6b;
+  padding: 30px 0;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+  height: 98vh;
+
+  position: fixed;
+  z-index: 100;
+  border-radius: 2rem;
+  border-right: 1px solid #e0e0e0;
+}
+*{
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+  box-sizing: border-box;
+}
+.sidebar.mobile {
+  transform: translateX(-100%);
+}
+
+.sidebar.mobile.open {
+  transform: translateX(0);
+}
+
+.logo-container {
+  padding: 0 25px 30px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.logo {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 15px;
+}
+
+.nav-link {
+  color: #3a4a6b;
+  padding: 12px 20px;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  background: #cadff8;
+  color: #3d6ca9;
+}
+
+.nav-link.active {
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+.mobile-menu-button {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 101;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  color: #3a4a6b;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .sidebar {
+    padding-top: 80px;
+  }
+}
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Navbar\Navbar.jsx
+import { Link } from 'react-router-dom';
+import { FiMenu, FiX } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import './Navbar.css';
+import logo from '../../assets/logo.svg';
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) setIsOpen(true);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return (
+    <>
+      {isMobile && (
+        <button className="mobile-menu-button" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+        </button>
+      )}
+      
+      <div className={`sidebar ${isOpen ? 'open' : ''} ${isMobile ? 'mobile' : ''}`}>
+        <div className="logo-container">
+          <img src={logo} alt="Logo" className="logo" />
+        </div>
+        <nav className="nav-menu">
+          <Link to="/" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
+            Assessment Data
+          </Link>
+          
+        </nav>
+      </div>
+    </>
+  );
+};
+
+export default Navbar;
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Table\DataTable.css
+.data-table-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+}
+
+.table-title {
+  color: #1a237e;
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-size: 1.4rem;
+}
+
+.table-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #546e7a;
+}
+
+.last-updated {
+  font-size: 0.8rem;
+  color: #78909c;
+  font-style: italic;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .header-content {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  
+  .action-buttons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .filter-container > * {
+    width: 100%;
+    margin-right: 0 !important;
+    margin-bottom: 12px;
+  }
+}
+
+/* Animation for export button */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.exporting {
+  position: relative;
+  overflow: hidden;
+}
+
+.exporting::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Table\DataTable.jsx
+import { useState, useMemo, useEffect } from 'react';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper,
+  TextField,
+  MenuItem,
+  TableSortLabel,
+  Typography,
+  Box,
+  TablePagination,
+  Chip,
+  Button,
+  Avatar,
+  CircularProgress,
+  Snackbar,
+  Alert,
+  useMediaQuery,
+  ThemeProvider,
+  createTheme
+} from '@mui/material';
+import { 
+  FiFilter, 
+  FiX,
+  FiDownload,
+  FiPieChart
+} from 'react-icons/fi';
+import * as XLSX from 'xlsx';
+import useAssessmentStore from '../../store/assessmentStore';
+import './DataTable.css';
+
+const DataTable = () => {
+  const { data, headers } = useAssessmentStore();
+  const [managerFilter, setManagerFilter] = useState('');
+  const [courseFilter, setCourseFilter] = useState('');
+  const [orderBy, setOrderBy] = useState('');
+  const [order, setOrder] = useState('asc');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width:768px)');
+
+  useEffect(() => {
+    if (data.length > 0) {
+      setLoading(false);
+    }
+  }, [data]);
+
+  const theme = createTheme({
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            whiteSpace: 'nowrap',
+            minWidth: 'auto',
+            padding: isMobile ? '6px 8px' : '8px 16px'
+          }
+        }
+      }
+    }
+  });
+
+  const allHeaders = useMemo(() => {
+    if (headers && headers.length > 0) return headers;
+    if (data.length === 0) return [];
+    const headerSet = new Set();
+    data.forEach(row => Object.keys(row).forEach(key => headerSet.add(key)));
+    return Array.from(headerSet);
+  }, [headers, data]);
+
+  const { uniqueManagers, uniqueCourses } = useMemo(() => {
+    const managers = new Set();
+    const courses = new Set();
+    
+    data.forEach(item => {
+      const managerKey = Object.keys(item).find(k => k.toLowerCase().includes('manager'));
+      const courseKey = Object.keys(item).find(k => k.toLowerCase().includes('course'));
+      
+      if (managerKey && item[managerKey]) managers.add(item[managerKey]);
+      if (courseKey && item[courseKey]) courses.add(item[courseKey]);
+    });
+    
+    return {
+      uniqueManagers: Array.from(managers).sort(),
+      uniqueCourses: Array.from(courses).sort()
+    };
+  }, [data]);
+
+  const processedData = useMemo(() => {
+    return data.filter(item => {
+      const managerKey = Object.keys(item).find(k => k.toLowerCase().includes('manager'));
+      const courseKey = Object.keys(item).find(k => k.toLowerCase().includes('course'));
+      
+      const matchesManager = !managerFilter || 
+        (managerKey && item[managerKey] && item[managerKey].toString() === managerFilter);
+      const matchesCourse = !courseFilter || 
+        (courseKey && item[courseKey] && item[courseKey].toString() === courseFilter);
+      return matchesManager && matchesCourse;
+    }).sort((a, b) => {
+      if (!orderBy) return 0;
+      const aValue = a[orderBy] ?? '';
+      const bValue = b[orderBy] ?? '';
+      return order === 'asc' 
+        ? aValue.toString().localeCompare(bValue.toString())
+        : bValue.toString().localeCompare(aValue.toString());
+    });
+  }, [data, managerFilter, courseFilter, orderBy, order]);
+
+  const handleExport = () => {
+    const exportData = processedData.map(row => {
+      const cleanRow = {};
+      allHeaders.forEach(header => {
+        if (header.includes('%') || header.toLowerCase().includes('score') || 
+            header.toLowerCase().includes('count') || header.toLowerCase().includes('time') ||
+            header === 'Batch') {
+          cleanRow[header] = row[header] ?? 0;
+        } else {
+          cleanRow[header] = row[header] ?? '';
+        }
+      });
+      return cleanRow;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportData, { header: allHeaders });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    XLSX.writeFile(wb, `Assessment_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const clearFilters = () => {
+    setManagerFilter('');
+    setCourseFilter('');
+    setPage(0);
+  };
+
+  const renderCellValue = (value, header) => {
+    if (header.toLowerCase().includes('percentage')) {
+      return (
+        <Chip
+          label={`${value !== undefined && value !== '' ? value : 0}%`}
+          size="small"
+          sx={{
+            background: (value || 0) >= 50 ? '#e8f5e9' : '#ffebee',
+            color: (value || 0) >= 50 ? '#2e7d32' : '#c62828',
+            fontWeight: '500'
+          }}
+        />
+      );
+    } else if (header.toLowerCase().includes('status') && !header.toLowerCase().includes('attendance')) {
+      const statusValue = (value || '').toString().toLowerCase();
+      const isQualified = statusValue === 'qualified' || 
+                         (statusValue.includes('qualif') && !statusValue.includes('not'));
+      
+      return (
+        <Chip
+          label={isQualified ? 'Qualified' : 'Not Qualified'}
+          size="small"
+          sx={{
+            background: isQualified ? '#e8f5e9' : '#ffebee',
+            color: isQualified ? '#2e7d32' : '#c62828',
+            fontWeight: '500'
+          }}
+        />
+      );
+    } else if (header.toLowerCase().includes('attendance')) {
+      const attendanceValue = (value || '').toString().toLowerCase();
+      const isPresent = attendanceValue === 'present' || 
+                       attendanceValue === 'yes' ||
+                       attendanceValue === 'attended' ||
+                       attendanceValue === 'true' ||
+                       attendanceValue === '1';
+      
+      return (
+        <Chip
+          label={isPresent ? 'Yes' : 'No'}
+          size="small"
+          sx={{
+            background: isPresent ? '#e8f5e9' : '#ffebee',
+            color: isPresent ? '#2e7d32' : '#c62828',
+            fontWeight: '500'
+          }}
+        />
+      );
+    } else if (header.toLowerCase().includes('self-interested') || 
+               header.toLowerCase().includes('self interested') || 
+               header.toLowerCase().includes('interested candidate')) {
+      const interestValue = (value || '').toString().toLowerCase();
+      const isInterested = interestValue === 'yes' || 
+                           interestValue === 'true' ||
+                           interestValue === 'interested' ||
+                           interestValue === '1';
+      
+      return (
+        <Chip
+          label={isInterested ? 'Yes' : 'No'}
+          size="small"
+          sx={{
+            background: isInterested ? '#e8f5e9' : '#ffebee',
+            color: isInterested ? '#2e7d32' : '#c62828',
+            fontWeight: '500'
+          }}
+        />
+      );
+    } else if ((typeof value === 'number' || !isNaN(Number(value))) && 
+               value !== '' && value !== null && value !== undefined) {
+      return value.toString();
+    } else {
+      return value !== undefined && value !== null ? value.toString() : '';
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <ThemeProvider theme={theme}>
+      <div className="data-table-container">
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+            {error}
+          </Alert>
+        </Snackbar>
+
+        <div className="table-header">
+          <div className="header-content">
+            <Avatar sx={{ bgcolor: '#1976d2', width: 40, height: 40, mr: 2 }}>
+              <FiPieChart size={20} />
+            </Avatar>
+            <div>
+              <Typography variant="h5" className="table-title">
+                Assessment Results
+              </Typography>
+              <Typography variant="subtitle2" className="table-subtitle">
+                <Chip 
+                  label={`${processedData.length} records`}
+                  size="small"
+                  sx={{
+                    background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)',
+                    color: '#0d47a1',
+                    fontWeight: '600',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <span className="last-updated">
+                  Last updated: {new Date().toLocaleTimeString()}
+                </span>
+              </Typography>
+            </div>
+          </div>
+          
+          <div className="action-buttons">
+            <Button 
+              variant="contained" 
+              startIcon={<FiDownload />}
+              onClick={handleExport}
+              sx={{
+                background: 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)',
+                color: 'white',
+                boxShadow: '0 2px 10px rgba(25, 118, 210, 0.3)',
+                '&:hover': { background: 'linear-gradient(135deg, #1565c0 0%, #1e88e5 100%)' },
+                mr: 2
+              }}
+            >
+              {isMobile ? 'Export' : 'Export Data'}
+            </Button>
+            <Button 
+              variant="contained" 
+              startIcon={<FiPieChart />}
+              onClick={() => useAssessmentStore.getState().toggleView()}
+              sx={{
+                background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+                color: 'white',
+                '&:hover': { background: 'linear-gradient(135deg, #388e3c 0%, #1b5e20 100%)' }
+              }}
+            >
+              {isMobile ? 'Charts' : 'View Charts'}
+            </Button>
+          </div>
+        </div>
+
+        <div className="filter-container">
+          <TextField
+            select
+            size="small"
+            value={managerFilter}
+            onChange={(e) => {
+              setManagerFilter(e.target.value);
+              setPage(0);
+            }}
+            label="Filter by Manager"
+            sx={{ 
+              minWidth: 220,
+              mr: 2,
+              '& .MuiOutlinedInput-root': { background: '#f5f9ff', borderRadius: '8px' }
+            }}
+            variant="outlined"
+          >
+            <MenuItem value=""><em>All Managers</em></MenuItem>
+            {uniqueManagers.map(manager => (
+              <MenuItem key={manager} value={manager}>{manager}</MenuItem>
+            ))}
+          </TextField>
+          
+          <TextField
+            select
+            size="small"
+            value={courseFilter}
+            onChange={(e) => {
+              setCourseFilter(e.target.value);
+              setPage(0);
+            }}
+            label="Filter by Course"
+            sx={{ 
+              minWidth: 220,
+              '& .MuiOutlinedInput-root': { background: '#f5f9ff', borderRadius: '8px' }
+            }}
+            variant="outlined"
+          >
+            <MenuItem value=""><em>All Courses</em></MenuItem>
+            {uniqueCourses.map(course => (
+              <MenuItem key={course} value={course}>{course}</MenuItem>
+            ))}
+          </TextField>
+
+          {(managerFilter || courseFilter) && (
+            <Button
+              startIcon={<FiX />}
+              onClick={clearFilters}
+              sx={{ ml: 2, color: '#f44336' }}
+            >
+              Clear Filters
+            </Button>
+          )}
+        </div>
+
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            borderRadius: '12px',
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+            maxHeight: 'calc(100vh - 280px)',
+            '&::-webkit-scrollbar': { height: '8px', width: '8px' },
+            '&::-webkit-scrollbar-thumb': { backgroundColor: '#bdbdbd', borderRadius: '4px' }
+          }}
+        >
+          <Table stickyHeader size="small" aria-label="assessment data table">
+            <TableHead>
+              <TableRow>
+                {allHeaders.map(header => (
+                  <TableCell 
+                    key={header}
+                    sx={{ 
+                      background: '#f5f9ff',
+                      fontWeight: '600',
+                      color: '#1976d2',
+                      whiteSpace: 'nowrap',
+                      borderBottom: '1px solid #e0e0e0'
+                    }}
+                  >
+                    <TableSortLabel
+                      active={orderBy === header}
+                      direction={orderBy === header ? order : 'asc'}
+                      onClick={() => handleSort(header)}
+                      sx={{
+                        '&:hover': { color: '#0d47a1' },
+                        '&.Mui-active': { color: '#0d47a1' }
+                      }}
+                    >
+                      {header}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(rowsPerPage > 0
+                ? processedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : processedData
+              ).map((row, index) => (
+                <TableRow 
+                  key={index}
+                  sx={{ 
+                    '&:nth-of-type(even)': { backgroundColor: '#fafafa' },
+                    '&:hover': { backgroundColor: '#f5f5f5' }
+                  }}
+                >
+                  {allHeaders.map(header => (
+                    <TableCell 
+                      key={header} 
+                      sx={{ whiteSpace: 'nowrap', borderBottom: '1px solid #f0f0f0' }}
+                    >
+                      {renderCellValue(row[header], header)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 50, 100]}
+          component="div"
+          count={processedData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{
+            mt: 2,
+            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+              fontSize: '0.875rem'
+            }
+          }}
+        />
+      </div>
+    </ThemeProvider>
+  );
+};
+
+export default DataTable;
+
+
+### D:\ICANIO intern\React\dashboard-project\src\components\Table\index.js
+export { default } from './DataTable';
+
+
+### D:\ICANIO intern\React\dashboard-project\src\pages\Dashboard\AssessmentData.css
+.dashboard-container {
+  padding: 30px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f7ff 100%);
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  width: calc(100% - 280px);
+  box-sizing: border-box;
+}
+
+.upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.upload-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 50px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.05),
+    0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+  border: 2px dashed rgba(77, 171, 247, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.upload-card:hover {
+  border-color: rgba(77, 171, 247, 0.6);
+  transform: translateY(-3px);
+}
+
+.upload-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(77, 171, 247, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.upload-card:hover::before {
+  opacity: 1;
+}
+
+.upload-icon {
+  font-size: 64px;
+  color: #4dabf7;
+  margin-bottom: 25px;
+  filter: drop-shadow(0 5px 10px rgba(77, 171, 247, 0.3));
+}
+
+.upload-card h3 {
+  margin: 15px 0;
+  color: #1e293b;
+  font-size: 1.6rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #1a73e8, #4dabf7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.upload-card p {
+  color: #64748b;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.loading-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4dabf7, #228be6, #4dabf7);
+  background-size: 200% 100%;
+  animation: gradientLoading 1.5s linear infinite;
+}
+
+@keyframes gradientLoading {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.error-message {
+  color: #e53e3e;
+  margin-top: 20px;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  background: rgba(229, 62, 62, 0.1);
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.05),
+    0 6px 10px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  margin-top: 20px;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 1024px) {
+  .dashboard-container {
+    width: 100%;
+    padding-top: 30px;
+  }
+  
+  .upload-container {
+    min-height: calc(100vh - 120px);
+  }
+  
+  .upload-card {
+    padding: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 20px;
+    /* padding-top: 90px; */
+  }
+  
+  .upload-container {
+    padding: 15px;
+  }
+  
+  .upload-card {
+    padding: 30px;
+    border-radius: 20px;
+  }
+  
+  .upload-icon {
+    font-size: 56px;
+  }
+  
+  .upload-card h3 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 495px) {
+  .dashboard-container {
+    margin-left: 0;
+    padding: 15px;
+    /* padding-top: 90px; */
+  }
+  
+  .upload-card {
+    padding: 25px;
+    border-radius: 18px;
+  }
+  
+  .upload-icon {
+    font-size: 48px;
+  }
+  
+  .upload-card h3 {
+    font-size: 1.3rem;
+  }
+  
+  .upload-card p {
+    font-size: 0.9rem;
+  }
+}
+
+
+### D:\ICANIO intern\React\dashboard-project\src\pages\Dashboard\AssessmentData.jsx
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Box,
+  Button,
+  Avatar,
+  Typography,
+  useTheme,
+  AppBar,
+  Toolbar,
+  IconButton
+} from '@mui/material';
+import Papa from 'papaparse';
+import DataTable from '../../components/Table/DataTable';
+import ChartView from '../../components/Charts/ChartView';
+import { FiUploadCloud, FiPieChart, FiMinimize2} from 'react-icons/fi';
+import * as XLSX from 'xlsx';
+import useAssessmentStore from '../../store/assessmentStore';
+import './AssessmentData.css';
+
+const AssessmentData = () => {
+  const fileInputRef = useRef(null);
+  const theme = useTheme();
+  const [fullscreen, setFullscreen] = useState(false);
+  
+  const {
+    data,
+    headers,
+    loading: isLoading,
+    error,
+    hasData,
+    showCharts,
+    setData,
+    setHeaders,
+    setLoading,
+    setError,
+    setHasData,
+    clearData,
+    toggleView
+  } = useAssessmentStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && fullscreen) {
+        setFullscreen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [fullscreen]);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+    setError(null);
+    setHasData(false);
+    e.target.value = '';
+
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith('.csv')) {
+      handleCSVUpload(file);
+    } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+      handleExcelUpload(file);
+    } else {
+      setError('Unsupported file format. Please upload a CSV or Excel file.');
+      setLoading(false);
+    }
+  };
+
+  const handleCSVUpload = (file) => {
+    Papa.parse(file, {
+      header: true,
+      complete: (results) => {
+        if (results.data.length === 0) {
+          setError('The CSV file is empty');
+          setLoading(false);
+          return;
+        }
+
+        const cleanData = results.data
+          .filter(row => Object.values(row).some(val => val !== undefined && val !== null && val.toString().trim() !== ''))
+          .map(row => {
+            const cleanRow = {};
+            Object.keys(row).forEach(key => {
+              if (row[key] === 0 || row[key] === '0') {
+                cleanRow[key.trim()] = 0;
+              } else {
+                cleanRow[key.trim()] = typeof row[key] === 'string' ? row[key].trim() : row[key];
+              }
+            });
+            return cleanRow;
+          });
+
+        setHeaders(Object.keys(cleanData[0]));
+        setData(cleanData);
+        setHasData(true);
+        setLoading(false);
+      },
+      error: (error) => {
+        setError('Error parsing CSV file: ' + error.message);
+        setLoading(false);
+      }
+    });
+  };
+
+  const handleExcelUpload = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { defval: '', raw: false });
+        
+        if (!jsonData || jsonData.length === 0) {
+          throw new Error('Excel file is empty or could not be parsed');
+        }
+
+        const allColumns = new Set();
+        jsonData.forEach(row => Object.keys(row).forEach(key => allColumns.add(key)));
+
+        const processed = jsonData.map(row => {
+          const newRow = {};
+          Array.from(allColumns).forEach(header => {
+            const value = row[header];
+            if (value === undefined || value === null) {
+              newRow[header] = '';
+            } else if (typeof value === 'number') {
+              newRow[header] = value;
+            } else if (typeof value === 'string' && !isNaN(value) && value.trim() !== '') {
+              newRow[header] = isNaN(parseFloat(value)) ? value : parseFloat(value);
+            } else if (value instanceof Date) {
+              newRow[header] = value.toISOString().split('T')[0];
+            } else {
+              newRow[header] = value.toString();
+            }
+          });
+          return newRow;
+        });
+
+        setHeaders(Object.keys(processed[0]));
+        setData(processed);
+        setHasData(true);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error processing Excel file:', error);
+        setError('Error processing Excel file: ' + error.message);
+        setLoading(false);
+      }
+    };
+    reader.onerror = (error) => {
+      console.error('Error reading file:', error);
+      setError('Error reading file: ' + error.message);
+      setLoading(false);
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
+  const toggleFullscreen = () => {
+    setFullscreen(!fullscreen);
+  };
+
+  return (
+    <div className="dashboard-container">
+      {fullscreen && (
+        <AppBar 
+          position="fixed" 
+          sx={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: 'none',
+            zIndex: theme.zIndex.drawer + 1
+          }}
+        >
+          <Toolbar>
+            <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
+              Assessment Analytics Dashboard
+            </Typography>
+            <IconButton
+              color="inherit"
+              onClick={toggleFullscreen}
+              sx={{ color: theme.palette.text.primary }}
+            >
+              <FiMinimize2 />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      )}
+
+      <AnimatePresence mode="wait">
+        {!hasData ? (
+          <motion.div
+            className="upload-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".csv,.xlsx,.xls"
+              style={{ display: 'none' }}
+            />
+            <motion.div 
+              className="upload-card"
+              whileHover={{ scale: 1.02, boxShadow: "0 20px 40px rgba(77, 171, 247, 0.2)" }}
+              whileTap={{ scale: 0.98 }}
+              onClick={triggerFileInput}
+            >
+              <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
+                <FiUploadCloud className="upload-icon" />
+              </motion.div>
+              <Typography variant="h4" component="h3">
+                Upload Assessment Data
+              </Typography>
+              <Typography variant="body1">
+                Drag & drop or click to browse files
+              </Typography>
+              {isLoading && (
+                <motion.div 
+                  className="loading-bar"
+                  initial={{ width: 0 }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              )}
+              {error && (
+                <motion.div 
+                  className="error-message"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ type: "spring" }}
+                >
+                  {error}
+                </motion.div>
+              )}
+            </motion.div>
+          </motion.div>
+        ) : (
+          <motion.div
+            className="table-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            style={{ 
+              marginTop: fullscreen ? '64px' : '0',
+              height: fullscreen ? 'calc(100vh - 64px)' : 'auto'
+            }}
+          >
+            {showCharts ? (
+              <ChartView 
+                data={data} 
+                onToggleView={toggleView}
+                fullscreen={fullscreen}
+                onToggleFullscreen={toggleFullscreen}
+              />
+            ) : (
+              <DataTable />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default AssessmentData;
+
+
+### D:\ICANIO intern\React\dashboard-project\src\pages\Dashboard\index.js
+export { default } from './AssessmentData.jsx';
+
+
+### D:\ICANIO intern\React\dashboard-project\src\store\assessmentStore.js
+import { create } from 'zustand';
+import axios from 'axios';
+
+const useAssessmentStore = create((set) => ({
+  data: [],
+  headers: [],
+  loading: false,
+  error: null,
+  hasData: false,
+  showCharts: false,
+
+  // Actions
+  setData: (newData) => set({ data: newData }),
+  setHeaders: (newHeaders) => set({ headers: newHeaders }),
+  setLoading: (isLoading) => set({ loading: isLoading }),
+  setError: (error) => set({ error }),
+  setHasData: (hasData) => set({ hasData }),
+  clearData: () => set({ data: [], headers: [], hasData: false, showCharts: false }),
+  toggleView: () => set((state) => ({ showCharts: !state.showCharts })),
+
+  fetchDataFromApi: async () => {
+    try {
+      set({ loading: true, error: null });
+      const response = await axios.get('/api/assessment-data');
+      const data = response.data;
+      const headers = data.length > 0 ? Object.keys(data[0]) : [];
+      set({ data, headers, hasData: true, loading: false });
+    } catch (error) {
+      set({ 
+        error: error.response?.data?.message || 'Failed to fetch assessment data',
+        loading: false
+      });
+    }
+  }
+}));
+
+export default useAssessmentStore;
+
+
