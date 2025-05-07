@@ -10,14 +10,16 @@ import {
   Typography,
   TableSortLabel,
   Tooltip,
-  useTheme
+  useTheme,
+  Avatar
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { getInitials } from './chartUtils';
 
 const IntegrityTable = ({ data }) => {
   const theme = useTheme();
-  const [order, setOrder] = useState('asc');
+  const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('Integrity Score (out of 10)');
 
   const handleSort = (property) => {
@@ -36,44 +38,43 @@ const IntegrityTable = ({ data }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
     >
-      <Box sx={{
-        width: '100%',
-        height: 'calc(100vh - 200px)',
-        overflow: 'auto',
-        borderRadius: 3,
-        border: `1px solid ${theme.palette.divider}`,
-        background: theme.palette.mode === 'dark' ? '#1e1e2f' : '#f0f4ff',
-        boxShadow: theme.shadows[3],
-        '&::-webkit-scrollbar': {
-          width: '8px'
-        },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: theme.palette.primary.light,
-          borderRadius: '4px'
-        },
-        '&::-webkit-scrollbar-track': {
-          backgroundColor: theme.palette.background.default
-        }
-      }}>
-        <TableContainer
-          component={Paper}
-          sx={{
-            maxHeight: '100%',
-            boxShadow: 'none',
-            backgroundColor: 'transparent'
-          }}
-        >
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          borderRadius: 4,
+          background: theme.palette.background.paper,
+          height: 'calc(100vh - 200px)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: theme.palette.text.primary }}>
+          Integrity Scores Overview
+        </Typography>
+        <TableContainer sx={{ flex: 1, borderRadius: 2, overflow: 'auto' }}>
           <Table stickyHeader size="small" aria-label="integrity table">
             <TableHead>
               <TableRow>
-                {['Name', 'Integrity Score (out of 10)', 'Time Spent Offtab (in secs)'].map((column, idx) => (
+                <TableCell
+                  sx={{
+                    backgroundColor: theme.palette.primary.dark,
+                    color: theme.palette.primary.contrastText,
+                    fontWeight: 'bold',
+                    fontSize: '14px'
+                  }}
+                >
+                  Candidate
+                </TableCell>
+                {['Integrity Score (out of 10)', 'Time Spent Offtab (in secs)'].map((column) => (
                   <TableCell
                     key={column}
-                    align={idx === 0 ? 'left' : 'right'}
+                    align="right"
                     sx={{
-                      backgroundColor: theme.palette.primary.light,
+                      backgroundColor: theme.palette.primary.dark,
                       color: theme.palette.primary.contrastText,
                       fontWeight: 'bold',
                       fontSize: '14px'
@@ -85,7 +86,7 @@ const IntegrityTable = ({ data }) => {
                       onClick={() => handleSort(column)}
                       sx={{
                         '& .MuiTableSortLabel-icon': {
-                          color: theme.palette.primary.contrastText + ' !important'
+                          color: `${theme.palette.primary.contrastText} !important`
                         }
                       }}
                     >
@@ -94,7 +95,7 @@ const IntegrityTable = ({ data }) => {
                           <span>Off-task Time</span>
                         </Tooltip>
                       ) : (
-                        column === 'Name' ? 'Employee Name' : 'Integrity Score'
+                        'Integrity Score'
                       )}
                     </TableSortLabel>
                   </TableCell>
@@ -107,57 +108,63 @@ const IntegrityTable = ({ data }) => {
                   key={index}
                   sx={{
                     backgroundColor: index % 2 === 0
-                      ? theme.palette.mode === 'dark' ? '#252539' : '#eaf1ff'
-                      : theme.palette.mode === 'dark' ? '#1b1b2c' : '#dbe7ff',
+                      ? theme.palette.mode === 'dark' ? '#252539' : '#f5f9ff'
+                      : theme.palette.mode === 'dark' ? '#1b1b2c' : '#eaf2ff',
                     '&:hover': {
                       backgroundColor: theme.palette.action.hover
                     }
                   }}
                 >
-                  <TableCell sx={{
-                    fontWeight: 500,
-                    color: theme.palette.text.primary,
-                    minWidth: 150
-                  }}>
-                    {row.Name}
+                  <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="body2" fontWeight={500}>
+                      {row.Name}
+                    </Typography>
                   </TableCell>
                   <TableCell align="right">
-                    <Box sx={{
-                      display: 'inline-block',
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1,
-                      fontSize: '13px',
-                      backgroundColor: row['Integrity Score (out of 10)'] >= 8
-                        ? theme.palette.success.light
-                        : row['Integrity Score (out of 10)'] >= 5
-                          ? theme.palette.warning.light
-                          : theme.palette.error.light,
-                      color: row['Integrity Score (out of 10)'] >= 8
-                        ? theme.palette.success.dark
-                        : row['Integrity Score (out of 10)'] >= 5
-                          ? theme.palette.warning.dark
-                          : theme.palette.error.dark,
-                      fontWeight: 600
-                    }}>
+                    <Box
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 12,
+                        fontSize: '13px',
+                        backgroundColor:
+                          row['Integrity Score (out of 10)'] >= 8
+                            ? 'rgba(46, 125, 50, 0.1)'
+                            : row['Integrity Score (out of 10)'] >= 5
+                              ? 'rgba(237, 108, 2, 0.1)'
+                              : 'rgba(211, 47, 47, 0.1)',
+                        color:
+                          row['Integrity Score (out of 10)'] >= 8
+                            ? theme.palette.success.dark
+                            : row['Integrity Score (out of 10)'] >= 5
+                              ? theme.palette.warning.dark
+                              : theme.palette.error.dark,
+                        fontWeight: 600
+                      }}
+                    >
                       {row['Integrity Score (out of 10)']}/10
                     </Box>
                   </TableCell>
                   <TableCell align="right">
-                    <Box sx={{
-                      display: 'inline-block',
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1,
-                      fontSize: '13px',
-                      backgroundColor: row['Time Spent Offtab (in secs)'] > 0
-                        ? theme.palette.error.light
-                        : theme.palette.success.light,
-                      color: row['Time Spent Offtab (in secs)'] > 0
-                        ? theme.palette.error.dark
-                        : theme.palette.success.dark,
-                      fontWeight: 600
-                    }}>
+                    <Box
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 12,
+                        fontSize: '13px',
+                        backgroundColor: row['Time Spent Offtab (in secs)'] > 0
+                          ? 'rgba(211, 47, 47, 0.1)'
+                          : 'rgba(46, 125, 50, 0.1)',
+                        color: row['Time Spent Offtab (in secs)'] > 0
+                          ? theme.palette.error.dark
+                          : theme.palette.success.dark,
+                        fontWeight: 600
+                      }}
+                    >
                       {row['Time Spent Offtab (in secs)'] > 0
                         ? `${Math.floor(row['Time Spent Offtab (in secs)']/60)}m ${row['Time Spent Offtab (in secs)']%60}s`
                         : 'None'}
@@ -168,7 +175,10 @@ const IntegrityTable = ({ data }) => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
+        <Typography variant="caption" sx={{ mt: 1, textAlign: 'right', color: theme.palette.text.secondary }}>
+          Showing {sortedData.length} records
+        </Typography>
+      </Paper>
     </motion.div>
   );
 };
