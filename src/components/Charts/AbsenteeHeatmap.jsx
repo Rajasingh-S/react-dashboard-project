@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { motion } from 'framer-motion';
+import { interpolateRainbow } from 'd3-scale-chromatic';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -32,24 +33,19 @@ const AbsenteeHeatmap = ({ data }) => {
 
   const maxCount = Math.max(...Object.values(absenteeData).map(item => item.count));
 
-  const getColor = (index) => {
-    const hue = (index * 137.5) % 360;
-    return `hsl(${hue}, 50%, 60%)`;
-  };
-
   const chartData = {
     labels: sortedManagers,
     datasets: [{
       label: 'Number of Absentees',
       data: sortedManagers.map(manager => absenteeData[manager].count),
-      backgroundColor: sortedManagers.map((_, index) => getColor(index)),
-      borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
-      borderWidth: 1.5,
-      borderRadius: 6,
-      barThickness: 35,
-      hoverBorderWidth: 2,
-      hoverBorderColor: theme.palette.error.main,
-      hoverBackgroundColor: sortedManagers.map((_, index) => getColor(index)),
+      backgroundColor: sortedManagers.map((_, i) => interpolateRainbow(i / sortedManagers.length)),
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)',
+      borderWidth: 1,
+      borderRadius: 8,
+      barThickness: 40,
+      hoverBorderWidth: 3,
+      hoverBorderColor: theme.palette.error.light,
+      hoverBackgroundColor: sortedManagers.map((_, i) => interpolateRainbow(i / sortedManagers.length)),
     }]
   };
 
@@ -73,41 +69,43 @@ const AbsenteeHeatmap = ({ data }) => {
     maintainAspectRatio: false,
     indexAxis: 'x',
     animation: {
-      duration: 1000,
-      easing: 'easeOutQuart',
-      delay: (context) => context.dataIndex * 60
+      duration: 1500,
+      easing: 'elasticOut',
+      delay: (context) => context.dataIndex * 80
     },
     layout: {
       padding: {
-        top: 20,
-        right: 30,
-        bottom: 40,
-        left: 20
+        top: 30,
+        right: 40,
+        bottom: 50,
+        left: 30
       }
     },
     plugins: {
-      legend: { display: false },
+      legend: { 
+        display: false 
+      },
       tooltip: {
         enabled: true,
-        backgroundColor: theme.palette.background.paper,
-        titleColor: theme.palette.error.main,
+        backgroundColor: theme.palette.background.default,
+        titleColor: theme.palette.error.light,
         bodyColor: theme.palette.text.primary,
         borderColor: theme.palette.divider,
-        borderWidth: 1,
+        borderWidth: 2,
         padding: 16,
-        cornerRadius: 8,
-        boxShadow: theme.shadows[4],
+        cornerRadius: 12,
+        boxShadow: theme.shadows[10],
         titleFont: {
-          size: 14,
+          size: 16,
           weight: 'bold',
           family: theme.typography.fontFamily
         },
         bodyFont: {
-          size: 12,
+          size: 14,
           family: theme.typography.fontFamily
         },
         footerFont: {
-          size: 10,
+          size: 12,
           style: 'italic',
           family: theme.typography.fontFamily
         },
@@ -122,53 +120,53 @@ const AbsenteeHeatmap = ({ data }) => {
           drawBorder: false
         },
         ticks: {
-          color: theme.palette.text.secondary,
+          color: theme.palette.text.primary,
           font: {
-            family: theme.typography.fontFamily,
-            size: 12,
+            family: "'Montserrat', sans-serif",
+            size: 13,
             weight: 'bold'
           },
-          padding: 8
+          padding: 10
         },
         title: {
           display: true,
           text: 'Managers',
-          color: theme.palette.text.primary,
+          color: theme.palette.primary.light,
           font: {
-            size: 13,
+            size: 16,
             weight: 'bold',
-            family: theme.typography.fontFamily
+            family: "'Montserrat', sans-serif"
           },
-          padding: { top: 15 }
+          padding: { top: 20 }
         }
       },
       y: {
         beginAtZero: true,
-        max: Math.ceil(maxCount * 1.1),
+        max: Math.ceil(maxCount * 1.2),
         grid: {
-          color: theme.palette.divider,
+          color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
           drawBorder: false,
-          lineWidth: 0.5
+          lineWidth: 0.8
         },
         ticks: {
           color: theme.palette.text.secondary,
           precision: 0,
           font: {
-            family: theme.typography.fontFamily,
-            size: 12
+            family: "'Montserrat', sans-serif",
+            size: 13
           },
-          padding: 6
+          padding: 10
         },
         title: {
           display: true,
           text: 'Number of Absentees',
-          color: theme.palette.text.primary,
+          color: theme.palette.primary.light,
           font: {
-            size: 13,
+            size: 16,
             weight: 'bold',
-            family: theme.typography.fontFamily
+            family: "'Montserrat', sans-serif"
           },
-          padding: { bottom: 10 }
+          padding: { bottom: 20 }
         }
       }
     },
@@ -182,19 +180,23 @@ const AbsenteeHeatmap = ({ data }) => {
     afterDatasetsDraw(chart) {
       const { ctx, data } = chart;
       ctx.save();
-      ctx.font = `bold 12px ${theme.typography.fontFamily}`;
+      ctx.font = `bold 14px 'Montserrat', sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
 
       chart.getDatasetMeta(0).data.forEach((bar, index) => {
         const value = data.datasets[0].data[index];
         const x = bar.x;
-        const y = bar.y - 10;
+        const y = bar.y - 12;
 
-        // Background box for better readability
         ctx.fillStyle = theme.palette.background.paper;
-        ctx.fillRect(x - 18, y - 20, 36, 18);
+        ctx.shadowColor = 'rgba(0,0,0,0.2)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.fillRect(x - 22, y - 24, 44, 24);
 
+        ctx.shadowColor = 'transparent';
         ctx.fillStyle = theme.palette.text.primary;
         ctx.fillText(value, x, y);
       });
@@ -205,41 +207,74 @@ const AbsenteeHeatmap = ({ data }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
     >
       <Box sx={{
         width: '100%',
-        overflow: 'auto',
-        maxHeight: '80vh',
-        '&::-webkit-scrollbar': { height: '8px', width: '8px' },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[400],
-          borderRadius: '4px'
-        },
-        '&::-webkit-scrollbar-track': {
-          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100]
-        }
+        height: 'calc(100vh - 180px)',
+        background: theme.palette.mode === 'dark' 
+          ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' 
+          : 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
+        borderRadius: '18px',
+        boxShadow: theme.shadows[10],
+        padding: '30px',
+        overflow: 'hidden',
+        border: theme.palette.mode === 'dark' 
+          ? '1px solid rgba(255,255,255,0.1)' 
+          : '1px solid rgba(0,0,0,0.1)'
       }}>
-        <Box
-          sx={{
-            minWidth: '800px',
-            padding: '25px 20px 40px 10px',
-            background: theme.palette.background.paper,
-            borderRadius: '14px',
-            boxShadow: theme.shadows[2],
-            position: 'relative'
-          }}
-          style={{ height: 'calc(100vh - 200px)' }}
-        >
-          <Bar data={chartData} options={options} plugins={[valueLabelsPlugin]} />
+        <Box sx={{
+          height: '100%',
+          width: '100%',
+          position: 'relative',
+          overflow: 'auto',
+          '&::-webkit-scrollbar': { 
+            height: '10px', 
+            width: '10px',
+            borderRadius: '10px'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: theme.palette.mode === 'dark' 
+              ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' 
+              : 'linear-gradient(135deg, #5f27cd 0%, #1dd1a1 100%)',
+            borderRadius: '10px'
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: theme.palette.mode === 'dark' 
+              ? 'rgba(255,255,255,0.05)' 
+              : 'rgba(0,0,0,0.05)'
+          }
+        }}>
+          <Bar 
+            data={chartData} 
+            options={options} 
+            plugins={[valueLabelsPlugin]} 
+          />
         </Box>
-        <Box sx={{ p: 2 }}>
-          <Typography variant="body2" align="right" fontWeight="bold" color="text.secondary">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Typography 
+            variant="subtitle1" 
+            align="right" 
+            sx={{ 
+              mt: 2,
+              fontWeight: 'bold',
+              background: theme.palette.mode === 'dark' 
+                ? 'linear-gradient(90deg, #ff6b6b, #feca57)' 
+                : 'linear-gradient(90deg, #5f27cd, #1dd1a1)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontSize: '16px'
+            }}
+          >
             Total Managers: {sortedManagers.length}
           </Typography>
-        </Box>
+        </motion.div>
       </Box>
     </motion.div>
   );
