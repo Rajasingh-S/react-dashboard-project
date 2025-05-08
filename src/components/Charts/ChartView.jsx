@@ -177,34 +177,7 @@ const ChartView = ({ data, onToggleView }) => {
             alignItems: "stretch",
           }}
         >
-          <Button
-            variant="outlined"
-            onClick={onToggleView}
-            sx={{
-              height: "36px",
-              minWidth: isMobile ? "50%" : "120px",
-              textTransform: "none",
-              flex: isMobile ? 1 : "none",
-              fontWeight: "bold",
-              color: "#1976d2",
-              borderColor: "#1976d2",
-              backgroundColor: "#ffffff",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                backgroundColor: "#1976d2",
-                color: "#ffffff",
-                borderColor: "#1976d2",
-                boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
-              },
-              "&:active": {
-                backgroundColor: "#115293",
-                borderColor: "#115293",
-                boxShadow: "none",
-              },
-            }}
-          >
-            Back to Table
-          </Button>
+        
 
           {/* Manager Filter */}
           <FormControl
@@ -270,6 +243,34 @@ const ChartView = ({ data, onToggleView }) => {
               Export PDF
             </Button>
           </Box>
+          <Button
+            variant="outlined"
+            onClick={onToggleView}
+            sx={{
+              height: "36px",
+              minWidth: isMobile ? "50%" : "120px",
+              textTransform: "none",
+              flex: isMobile ? 1 : "none",
+              fontWeight: "bold",
+              color: "#1976d2",
+              borderColor: "#1976d2",
+              backgroundColor: "#ffffff",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                backgroundColor: "#1976d2",
+                color: "#ffffff",
+                borderColor: "#1976d2",
+                boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
+              },
+              "&:active": {
+                backgroundColor: "#115293",
+                borderColor: "#115293",
+                boxShadow: "none",
+              },
+            }}
+          >
+            Back to Table
+          </Button>
         </Box>
       </Box>
 

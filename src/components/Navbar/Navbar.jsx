@@ -33,7 +33,7 @@ const Navbar = () => {
         </div>
         <nav className="nav-menu">
           <Link to="/" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
-            Assessment Data
+            Performance Insights
           </Link>
           
         </nav>
