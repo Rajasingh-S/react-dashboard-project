@@ -1,5 +1,5 @@
 import { Bar } from 'react-chartjs-2';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, useTheme, useMediaQuery } from '@mui/material';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,18 +11,32 @@ import {
 } from 'chart.js';
 import { motion } from 'framer-motion';
 import { interpolateSinebow } from 'd3-scale-chromatic';
+import { useEffect, useRef } from 'react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const ScoreChart = ({ data }) => {
   const theme = useTheme();
-  const sortedData = [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
+  const containerRef = useRef(null);
+  const chartRef = useRef(null);
 
-  const barHeight = 36;
-  const barSpacing = 20;
-  const chartHeight = Math.max(500, sortedData.length * (barHeight + barSpacing));
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const isTablet = useMediaQuery('(max-width:900px)');
+
+  const sortedData = [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
+  
+  // Adjust settings based on device
+  const barHeight = isMobile ? 16 : isTablet ? 20 : 24;
+  const barSpacing = isMobile ? 8 : 12;
+  const chartHeight = sortedData.length * (barHeight + barSpacing) + 80;
   const maxNameLength = Math.max(...sortedData.map(item => item.Name.length));
-  const nameAreaWidth = Math.min(300, maxNameLength * 10);
+  const nameAreaWidth = Math.min(isMobile ? 150 : isTablet ? 200 : 300, maxNameLength * 8);
+
+  useEffect(() => {
+    if (containerRef.current && chartRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, []);
 
   const chartData = {
     labels: sortedData.map(item => item.Name),
@@ -32,26 +46,11 @@ const ScoreChart = ({ data }) => {
       backgroundColor: sortedData.map((_, i) => interpolateSinebow(i / sortedData.length)),
       borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
       borderWidth: 1,
-      borderRadius: 10,
+      borderRadius: 6,
       barThickness: barHeight,
-      hoverBorderWidth: 3,
+      hoverBorderWidth: 2,
       hoverBorderColor: theme.palette.primary.light,
     }]
-  };
-
-  const tooltipCallbacks = {
-    title: (context) => [`${sortedData[context[0].dataIndex].Name}`],
-    label: (context) => {
-      const person = sortedData[context.dataIndex];
-      return [
-        `Score: ${context.raw}%`,
-        `Status: ${person.Status}`,
-        `Type: ${person['Employee or Intern']}`,
-        `Course: ${person.Course || 'N/A'}`,
-        `Manager: ${person.Manager || 'N/A'}`
-      ];
-    },
-    footer: () => ['Click bar for details']
   };
 
   const options = {
@@ -59,80 +58,52 @@ const ScoreChart = ({ data }) => {
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 1500,
-      easing: 'elasticOut',
-      delay: (context) => context.dataIndex * 50,
+      duration: 1200,
+      easing: 'easeOutBounce',
+      delay: (context) => context.dataIndex * 30,
     },
     layout: {
       padding: {
-        left: nameAreaWidth,
-        right: 80,
-        top: 30,
-        bottom: 30
+        left: nameAreaWidth + 10,
+        right: 50,
+        top: 20,
+        bottom: 40
       }
     },
     plugins: {
       legend: { display: false },
-      tooltip: {
-        enabled: true,
-        backgroundColor: theme.palette.background.default,
-        titleColor: theme.palette.primary.light,
-        bodyColor: theme.palette.text.primary,
-        borderColor: theme.palette.divider,
-        borderWidth: 2,
-        padding: 16,
-        cornerRadius: 12,
-        boxShadow: theme.shadows[10],
-        titleFont: {
-          size: 16,
-          weight: 'bold',
-          family: "'Montserrat', sans-serif"
-        },
-        bodyFont: {
-          size: 14,
-          family: "'Montserrat', sans-serif"
-        },
-        callbacks: tooltipCallbacks,
-        displayColors: false,
-      }
+      tooltip: { enabled: true },
     },
     scales: {
       x: {
         max: 100,
         min: 0,
-        grid: {
-          color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-          drawBorder: false,
-          drawTicks: false,
-          lineWidth: 0.8,
-        },
         ticks: {
-          color: theme.palette.text.secondary,
-          stepSize: 20,
           callback: (value) => `${value}%`,
-          padding: 10,
           font: {
-            size: 14,
+            size: isMobile ? 10 : 13,
             weight: 'bold',
             family: "'Montserrat', sans-serif",
           }
         },
         title: {
           display: true,
-          text: 'Score Percentage',
-          color: theme.palette.primary.light,
+          text: 'Score (%)',
           font: {
-            size: 16,
+            size: isMobile ? 12 : 15,
             weight: 'bold',
             family: "'Montserrat', sans-serif",
-          },
-          padding: { top: 20, bottom: 20 },
+          }
+        },
+        grid: {
+          drawTicks: false,
+          drawBorder: false,
         }
       },
-      y: { 
+      y: {
         display: false,
         grid: {
-          display: false
+          display: false,
         }
       }
     },
@@ -146,27 +117,20 @@ const ScoreChart = ({ data }) => {
     afterDatasetsDraw(chart) {
       const { ctx, chartArea: { left }, scales: { y } } = chart;
       ctx.save();
-      ctx.font = `bold 14px 'Montserrat', sans-serif`;
+      ctx.font = `bold ${isMobile ? 10 : 13}px 'Montserrat', sans-serif`;
       ctx.textBaseline = 'middle';
 
       chart.data.labels.forEach((label, index) => {
         const yPos = y.getPixelForValue(index);
 
-        // Left: Candidate name
         ctx.textAlign = 'right';
         ctx.fillStyle = theme.palette.text.primary;
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 4;
-        ctx.fillText(label, left - 20, yPos);
+        ctx.fillText(label, left - 10, yPos);
 
-        // Right: Score percentage
         const score = chart.data.datasets[0].data[index];
         const barEndX = chart.getDatasetMeta(0).data[index].x;
         ctx.textAlign = 'left';
-        ctx.fillStyle = theme.palette.text.primary;
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 4;
-        ctx.fillText(`${score}%`, barEndX + 12, yPos);
+        ctx.fillText(`${score}%`, barEndX + 8, yPos);
       });
 
       ctx.restore();
@@ -177,81 +141,57 @@ const ScoreChart = ({ data }) => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
+      transition={{ duration: 0.6 }}
     >
       <Box
         sx={{
           width: '100%',
-          height: 'calc(100vh - 180px)',
-          background: theme.palette.mode === 'dark' 
-            ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' 
-            : 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          borderRadius: '18px',
-          boxShadow: theme.shadows[10],
-          padding: '30px',
+          height: {
+            xs: '70vh', // Mobile
+            sm: '75vh', // Tablet
+            md: '80vh'  // Desktop
+          },
+          background: theme.palette.background.default,
+          borderRadius: 3,
+          boxShadow: theme.shadows[3],
+          padding: { xs: 2, sm: 3 },
           overflow: 'hidden',
-          border: theme.palette.mode === 'dark' 
-            ? '1px solid rgba(255,255,255,0.1)' 
-            : '1px solid rgba(0,0,0,0.1)'
+          border: `1px solid ${theme.palette.divider}`,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <Box sx={{
-          height: '100%',
-          width: '100%',
-          position: 'relative',
-          overflow: 'auto',
-          '&::-webkit-scrollbar': { 
-            height: '10px', 
-            width: '10px',
-            borderRadius: '10px'
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: theme.palette.mode === 'dark' 
-              ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' 
-              : 'linear-gradient(135deg, #5f27cd 0%, #1dd1a1 100%)',
-            borderRadius: '10px'
-          },
-          '&::-webkit-scrollbar-track': {
-            backgroundColor: theme.palette.mode === 'dark' 
-              ? 'rgba(255,255,255,0.05)' 
-              : 'rgba(0,0,0,0.05)'
-          }
-        }}>
-          <Box sx={{ 
-            minWidth: '800px',
-            minHeight: `${chartHeight}px`,
-            position: 'relative'
-          }}>
-            <Bar 
-              data={chartData} 
-              options={options} 
-              plugins={[externalLabelsPlugin]} 
+        <Box
+          ref={containerRef}
+          sx={{
+            flex: 1,
+            width: '100%',
+            overflow: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '6px',
+              height: '6px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: theme.palette.primary.main,
+              borderRadius: '4px',
+            },
+          }}
+        >
+          <Box
+            sx={{
+              minHeight: `${chartHeight}px`,
+              position: 'relative',
+              paddingBottom: '20px'
+            }}
+          >
+            <Bar
+              ref={chartRef}
+              data={chartData}
+              options={options}
+              plugins={[externalLabelsPlugin]}
             />
           </Box>
         </Box>
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Typography 
-            variant="subtitle1" 
-            align="right" 
-            sx={{ 
-              mt: 2,
-              fontWeight: 'bold',
-              background: theme.palette.mode === 'dark' 
-                ? 'linear-gradient(90deg, #ff6b6b, #feca57)' 
-                : 'linear-gradient(90deg, #5f27cd, #1dd1a1)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              fontSize: '16px',
-              fontFamily: "'Montserrat', sans-serif"
-            }}
-          >
-            Total Candidates: {sortedData.length}
-          </Typography>
-        </motion.div>
       </Box>
     </motion.div>
   );
