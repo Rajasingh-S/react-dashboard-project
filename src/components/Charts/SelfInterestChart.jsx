@@ -34,6 +34,11 @@ const SelfInterestChart = ({ data }) => {
 
     const totalScore = interestedData.reduce((sum, item) => sum + (item['Overall Percentage'] || 0), 0);
 
+    // Adjust bar thickness based on data length
+    const dataLength = interestedData.length;
+    const isFewData = dataLength <= 5;
+    const barThickness = isFewData ? 30 : 'flex';
+
     const chartData = {
       labels: interestedData.map(item => item.Name),
       datasets: [
@@ -44,7 +49,7 @@ const SelfInterestChart = ({ data }) => {
           borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
           borderWidth: 1,
           borderRadius: 12,
-          barThickness: 'flex',
+          barThickness,
           hoverBorderWidth: 2,
           hoverBorderColor: theme.palette.warning.light,
         }

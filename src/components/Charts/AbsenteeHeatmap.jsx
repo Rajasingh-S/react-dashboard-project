@@ -13,7 +13,6 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { interpolateRainbow } from 'd3-scale-chromatic';
 
-// Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
 
 const AbsenteeHeatmap = ({ data }) => {

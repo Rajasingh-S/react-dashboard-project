@@ -25,9 +25,9 @@ const ScoreChart = ({ data }) => {
 
   const sortedData = [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
   
-  // Adjust settings based on device
+  // Fixed settings regardless of data length
   const barHeight = isMobile ? 16 : isTablet ? 20 : 24;
-  const barSpacing = isMobile ? 8 : 12;
+  const barSpacing = 5; // Fixed 5px gap between bars
   const chartHeight = sortedData.length * (barHeight + barSpacing) + 80;
   const maxNameLength = Math.max(...sortedData.map(item => item.Name.length));
   const nameAreaWidth = Math.min(isMobile ? 150 : isTablet ? 200 : 300, maxNameLength * 8);
@@ -104,6 +104,10 @@ const ScoreChart = ({ data }) => {
         display: false,
         grid: {
           display: false,
+        },
+        // This ensures fixed spacing between bars
+        afterFit: (scale) => {
+          scale.height = (barHeight + barSpacing) * sortedData.length - barSpacing;
         }
       }
     },
@@ -147,9 +151,9 @@ const ScoreChart = ({ data }) => {
         sx={{
           width: '100%',
           height: {
-            xs: '70vh', // Mobile
-            sm: '75vh', // Tablet
-            md: '80vh'  // Desktop
+            xs: '70vh',
+            sm: '75vh',
+            md: '80vh'
           },
           background: theme.palette.background.default,
           borderRadius: 3,
