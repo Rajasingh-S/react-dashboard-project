@@ -95,18 +95,72 @@ const ChartView = ({ data, onToggleView }) => {
   const handleDownloadPDF = async () => {
     try {
       const element = document.getElementById(`chart-${currentChart}`);
-      const canvas = await html2canvas(element, {
-        scale: 2,
+      
+      // Get the chart dimensions
+      const width = element.scrollWidth;
+      const height = element.scrollHeight;
+      
+      // Create canvas with higher resolution
+      const canvas = document.createElement('canvas');
+      const scale = 2; // Increase for higher quality
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      
+      // Use html2canvas with proper configuration
+      await html2canvas(element, {
+        canvas,
+        scale,
+        logging: true,
         useCORS: true,
-        scrollY: -window.scrollY,
+        backgroundColor: theme.palette.background.paper,
         scrollX: 0,
+        scrollY: 0,
+        windowWidth: width,
+        windowHeight: height,
       });
-
+      
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: width > height ? "landscape" : "portrait",
+        unit: "mm",
+        format: "a4"
+      });
+      
+      // Calculate dimensions to fit A4 with margins
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10; // 10mm margin
+      const contentWidth = pageWidth - margin * 2;
+      const contentHeight = pageHeight - margin * 2 - 15; // Extra space for title
+      
+      // Calculate scale to fit content
+      const widthRatio = contentWidth / (width / 96 * 25.4); // Convert pixels to mm
+      const heightRatio = contentHeight / (height / 96 * 25.4);
+      const ratio = Math.min(widthRatio, heightRatio);
+      
+      // Add title
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(14);
+      pdf.text(charts[currentChart].title, pageWidth / 2, margin + 5, { align: "center" });
+      
+      // Add image to PDF
       const imgData = canvas.toDataURL("image/png", 1.0);
-      const pdf = new jsPDF("landscape", "pt", [canvas.width, canvas.height]);
-
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-      pdf.save(`${charts[currentChart].title}.pdf`);
+      const imgWidth = (width / 96 * 25.4) * ratio; // Convert to mm and scale
+      const imgHeight = (height / 96 * 25.4) * ratio;
+      const x = (pageWidth - imgWidth) / 2;
+      const y = margin + 10; // Below title
+      
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+      
+      // Add footer
+      const dateStr = new Date().toLocaleDateString();
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.text(`Exported on ${dateStr}`, pageWidth - margin, pageHeight - margin);
+      
+      // Save PDF
+      pdf.save(`${charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, '-')}.pdf`);
+      
     } catch (error) {
       console.error("Error generating PDF:", error);
     }
@@ -124,7 +178,7 @@ const ChartView = ({ data, onToggleView }) => {
 
   return (
     <Box sx={{ p: 3, height: "100vh", overflow: "hidden" }}>
-      {/* Responsive Header Section */}
+      {/* Header Section */}
       <Box
         sx={{
           display: "flex",
@@ -177,7 +231,34 @@ const ChartView = ({ data, onToggleView }) => {
             alignItems: "stretch",
           }}
         >
-        
+          <Button
+            variant="outlined"
+            onClick={onToggleView}
+            sx={{
+              height: "36px",
+              minWidth: isMobile ? "50%" : "120px",
+              textTransform: "none",
+              flex: isMobile ? 1 : "none",
+              fontWeight: "bold",
+              color: "#1976d2",
+              borderColor: "#1976d2",
+              backgroundColor: "#ffffff",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                backgroundColor: "#1976d2",
+                color: "#ffffff",
+                borderColor: "#1976d2",
+                boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
+              },
+              "&:active": {
+                backgroundColor: "#115293",
+                borderColor: "#115293",
+                boxShadow: "none",
+              },
+            }}
+          >
+            Back to Table
+          </Button>
 
           {/* Manager Filter */}
           <FormControl
@@ -220,56 +301,19 @@ const ChartView = ({ data, onToggleView }) => {
             </Select>
           </FormControl>
 
-          {/* Buttons Group */}
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              flexDirection: isMobile ? "row" : "row",
-              width: isMobile ? "100%" : "auto",
-            }}
-          >
-            <Button
-              variant="contained"
-              startIcon={<FiDownload />}
-              onClick={handleDownloadPDF}
-              sx={{
-                height: "36px",
-                minWidth: isMobile ? "50%" : "120px",
-                textTransform: "none",
-                flex: isMobile ? 1 : "none",
-              }}
-            >
-              Export PDF
-            </Button>
-          </Box>
+          {/* Export PDF Button */}
           <Button
-            variant="outlined"
-            onClick={onToggleView}
+            variant="contained"
+            startIcon={<FiDownload />}
+            onClick={handleDownloadPDF}
             sx={{
               height: "36px",
               minWidth: isMobile ? "50%" : "120px",
               textTransform: "none",
               flex: isMobile ? 1 : "none",
-              fontWeight: "bold",
-              color: "#1976d2",
-              borderColor: "#1976d2",
-              backgroundColor: "#ffffff",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                backgroundColor: "#1976d2",
-                color: "#ffffff",
-                borderColor: "#1976d2",
-                boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
-              },
-              "&:active": {
-                backgroundColor: "#115293",
-                borderColor: "#115293",
-                boxShadow: "none",
-              },
             }}
           >
-            Back to Table
+            Export PDF
           </Button>
         </Box>
       </Box>
@@ -295,6 +339,7 @@ const ChartView = ({ data, onToggleView }) => {
           </ChartWrapper>
         </ChartContainer>
 
+        {/* Navigation Arrows */}
         <IconButton
           onClick={() => navigateChart("prev")}
           sx={{

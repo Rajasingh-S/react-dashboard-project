@@ -58,9 +58,8 @@ const ScoreChart = ({ data }) => {
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 1200,
-      easing: 'easeOutBounce',
-      delay: (context) => context.dataIndex * 30,
+      duration: 500, // Shorter duration
+      easing: 'easeOutQuad', // Changed from 'easeOutBounce'
     },
     layout: {
       padding: {
@@ -105,7 +104,6 @@ const ScoreChart = ({ data }) => {
         grid: {
           display: false,
         },
-        // This ensures fixed spacing between bars
         afterFit: (scale) => {
           scale.height = (barHeight + barSpacing) * sortedData.length - barSpacing;
         }
@@ -143,9 +141,9 @@ const ScoreChart = ({ data }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
     >
       <Box
         sx={{
