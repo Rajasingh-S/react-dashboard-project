@@ -51,6 +51,7 @@ const ChartView = ({ data, onToggleView }) => {
   const [currentChart, setCurrentChart] = useState(0);
   const [selectedManager, setSelectedManager] = useState("All Managers");
   const chartWrapperRef = useRef(null);
+  const chartRefs = useRef([]);
 
   const managers = useMemo(() => {
     const managerSet = new Set();
@@ -94,73 +95,77 @@ const ChartView = ({ data, onToggleView }) => {
 
   const handleDownloadPDF = async () => {
     try {
-      const element = document.getElementById(`chart-${currentChart}`);
-      
-      // Get the chart dimensions
-      const width = element.scrollWidth;
-      const height = element.scrollHeight;
-      
-      // Create canvas with higher resolution
-      const canvas = document.createElement('canvas');
-      const scale = 2; // Increase for higher quality
-      canvas.width = width * scale;
-      canvas.height = height * scale;
-      
-      // Use html2canvas with proper configuration
-      await html2canvas(element, {
-        canvas,
-        scale,
-        logging: true,
+      const chartElement = chartRefs.current[currentChart];
+      if (!chartElement) return;
+
+      // Temporarily show all content
+      const originalOverflow = chartElement.style.overflow;
+      chartElement.style.overflow = 'visible';
+      chartElement.style.height = 'auto';
+
+      // Create canvas with optimal settings
+      const canvas = await html2canvas(chartElement, {
+        scale: 1.5, // Balanced quality and size
+        logging: false,
         useCORS: true,
         backgroundColor: theme.palette.background.paper,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: width,
-        windowHeight: height,
+        windowWidth: chartElement.scrollWidth,
+        windowHeight: chartElement.scrollHeight,
       });
-      
-      // Create PDF
-      const pdf = new jsPDF({
-        orientation: width > height ? "landscape" : "portrait",
-        unit: "mm",
-        format: "a4"
-      });
-      
-      // Calculate dimensions to fit A4 with margins
+
+      // Restore original styles
+      chartElement.style.overflow = originalOverflow;
+      chartElement.style.height = '';
+
+      // Calculate PDF dimensions
+      const pdf = new jsPDF('portrait', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10; // 10mm margin
+      const margin = 15; // 15mm margins
       const contentWidth = pageWidth - margin * 2;
-      const contentHeight = pageHeight - margin * 2 - 15; // Extra space for title
-      
-      // Calculate scale to fit content
-      const widthRatio = contentWidth / (width / 96 * 25.4); // Convert pixels to mm
-      const heightRatio = contentHeight / (height / 96 * 25.4);
-      const ratio = Math.min(widthRatio, heightRatio);
-      
+
+      // Calculate image dimensions to fit page
+      const imgRatio = canvas.width / canvas.height;
+      let imgWidth = contentWidth;
+      let imgHeight = imgWidth / imgRatio;
+
+      // If image is too tall, scale it down
+      const maxHeight = pageHeight - margin * 2 - 20; // 20mm for header/footer
+      if (imgHeight > maxHeight) {
+        imgHeight = maxHeight;
+        imgWidth = imgHeight * imgRatio;
+      }
+
+      // Center the image on the page
+      const xPos = (pageWidth - imgWidth) / 2;
+      const yPos = margin + 10;
+
       // Add title
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      pdf.text(charts[currentChart].title, pageWidth / 2, margin + 5, { align: "center" });
-      
-      // Add image to PDF
-      const imgData = canvas.toDataURL("image/png", 1.0);
-      const imgWidth = (width / 96 * 25.4) * ratio; // Convert to mm and scale
-      const imgHeight = (height / 96 * 25.4) * ratio;
-      const x = (pageWidth - imgWidth) / 2;
-      const y = margin + 10; // Below title
-      
-      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
-      
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
+      pdf.text(charts[currentChart].title, pageWidth / 2, margin, { align: 'center' });
+
+      // Add the image
+      pdf.addImage(
+        canvas.toDataURL('image/jpeg', 0.8), // Use JPEG with 0.8 quality
+        'JPEG',
+        xPos,
+        yPos,
+        imgWidth,
+        imgHeight
+      );
+
       // Add footer
       const dateStr = new Date().toLocaleDateString();
       pdf.setFontSize(10);
       pdf.setTextColor(100);
-      pdf.text(`Exported on ${dateStr}`, pageWidth - margin, pageHeight - margin);
-      
+      pdf.text(`Exported on ${dateStr}`, pageWidth - margin, pageHeight - margin, { align: 'right' });
+
       // Save PDF
       pdf.save(`${charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, '-')}.pdf`);
-      
+
     } catch (error) {
       console.error("Error generating PDF:", error);
     }
@@ -326,6 +331,7 @@ const ChartView = ({ data, onToggleView }) => {
               <Box
                 key={index}
                 id={`chart-${index}`}
+                ref={el => chartRefs.current[index] = el}
                 sx={{
                   minWidth: "100%",
                   height: "100%",
