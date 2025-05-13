@@ -10,7 +10,6 @@ import {
   Legend,
 } from 'chart.js';
 import { motion } from 'framer-motion';
-import { interpolateSinebow } from 'd3-scale-chromatic';
 import { useEffect, useRef } from 'react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -24,10 +23,8 @@ const ScoreChart = ({ data }) => {
   const isTablet = useMediaQuery('(max-width:900px)');
 
   const sortedData = [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
-  
-  // Fixed settings regardless of data length
   const barHeight = isMobile ? 16 : isTablet ? 20 : 24;
-  const barSpacing = 5; // Fixed 5px gap between bars
+  const barSpacing = 5;
   const chartHeight = sortedData.length * (barHeight + barSpacing) + 80;
   const maxNameLength = Math.max(...sortedData.map(item => item.Name.length));
   const nameAreaWidth = Math.min(isMobile ? 150 : isTablet ? 200 : 300, maxNameLength * 8);
@@ -38,12 +35,18 @@ const ScoreChart = ({ data }) => {
     }
   }, []);
 
+  const generateBlueColors = (count) => {
+    return Array.from({ length: count }, (_, i) =>
+      `hsl(${190 + (i * 15) % 70}, 85%, ${50 + (i % 5) * 6}%)`
+    );
+  };
+
   const chartData = {
     labels: sortedData.map(item => item.Name),
     datasets: [{
       label: 'Score',
       data: sortedData.map(item => item['Overall Percentage']),
-      backgroundColor: sortedData.map((_, i) => interpolateSinebow(i / sortedData.length)),
+      backgroundColor: generateBlueColors(sortedData.length),
       borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
       borderWidth: 1,
       borderRadius: 6,
@@ -58,8 +61,8 @@ const ScoreChart = ({ data }) => {
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 500, // Shorter duration
-      easing: 'easeOutQuad', // Changed from 'easeOutBounce'
+      duration: 500,
+      easing: 'easeOutQuad',
     },
     layout: {
       padding: {
@@ -165,6 +168,7 @@ const ScoreChart = ({ data }) => {
       >
         <Box
           ref={containerRef}
+          data-export-id="score-chart"
           sx={{
             flex: 1,
             width: '100%',

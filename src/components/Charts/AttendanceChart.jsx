@@ -10,7 +10,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { interpolatePlasma } from 'd3-scale-chromatic';
 import { useMemo } from 'react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -34,19 +33,24 @@ const AttendanceChart = ({ data = [] }) => {
 
     const maxPresent = Math.max(...sortedManagers.map(mgr => summary[mgr].present));
 
+    const generateBlueColors = (count) => {
+      return Array.from({ length: count }, (_, i) => 
+        `hsl(${200 + (i * 20) % 80}, 80%, ${50 + (i % 4) * 7}%)`
+      );
+    };
+
     const chartData = {
       labels: sortedManagers,
       datasets: [{
         label: 'Number of Present Employees',
         data: sortedManagers.map(mgr => summary[mgr].present),
-        backgroundColor: sortedManagers.map((_, i) => interpolatePlasma(i / sortedManagers.length)),
+        backgroundColor: generateBlueColors(sortedManagers.length),
         borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
         borderWidth: 1,
         borderRadius: 8,
         barThickness: 40,
         hoverBorderWidth: 3,
         hoverBorderColor: theme.palette.success.light,
-        hoverBackgroundColor: sortedManagers.map((_, i) => interpolatePlasma(i / sortedManagers.length)),
       }]
     };
 
@@ -189,8 +193,8 @@ const AttendanceChart = ({ data = [] }) => {
             '&::-webkit-scrollbar': { width: '8px' },
             '&::-webkit-scrollbar-thumb': {
               background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #ff6b6b, #feca57)'
-                : 'linear-gradient(135deg, #5f27cd, #1dd1a1)',
+                ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
+                : 'linear-gradient(135deg, #1976d2, #0288d1)',
               borderRadius: 10,
             }
           }}

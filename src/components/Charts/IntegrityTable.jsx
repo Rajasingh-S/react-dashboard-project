@@ -66,8 +66,8 @@ const IntegrityTable = ({ data }) => {
             color: theme.palette.text.primary,
             fontSize: '1.5rem',
             background: theme.palette.mode === 'dark' 
-              ? 'linear-gradient(90deg, #ff6b6b, #feca57)' 
-              : 'linear-gradient(90deg, #5f27cd, #1dd1a1)',
+              ? 'linear-gradient(90deg, #4a6fa5, #166d67)' 
+              : 'linear-gradient(90deg, #1976d2, #0288d1)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
           }}
@@ -87,8 +87,8 @@ const IntegrityTable = ({ data }) => {
             },
             '&::-webkit-scrollbar-thumb': {
               background: theme.palette.mode === 'dark' 
-                ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' 
-                : 'linear-gradient(135deg, #5f27cd 0%, #1dd1a1 100%)',
+                ? 'linear-gradient(135deg, #4a6fa5 0%, #166d67 100%)' 
+                : 'linear-gradient(135deg, #1976d2 0%, #0288d1 100%)',
               borderRadius: '10px'
             },
             '&::-webkit-scrollbar-track': {
@@ -195,13 +195,13 @@ const IntegrityTable = ({ data }) => {
                         width: 32,
                         height: 32,
                         mr: 2,
-                        bgcolor: theme.palette.mode === 'dark' 
-                          ? `hsl(${(index * 137.5) % 360}, 70%, 30%)` 
-                          : `hsl(${(index * 137.5) % 360}, 70%, 70%)`,
+                        bgcolor: `hsl(${180 + (index * 137.5) % 60}, 70%, ${
+                          theme.palette.mode === 'dark' ? '40%' : '70%'
+                        })`,
                         color: theme.palette.getContrastText(
-                          theme.palette.mode === 'dark' 
-                            ? `hsl(${(index * 137.5) % 360}, 70%, 30%)` 
-                            : `hsl(${(index * 137.5) % 360}, 70%, 70%)`
+                          `hsl(${180 + (index * 137.5) % 60}, 70%, ${
+                            theme.palette.mode === 'dark' ? '40%' : '70%'
+                          })`
                         ),
                         fontSize: '0.8rem',
                         fontWeight: 'bold'

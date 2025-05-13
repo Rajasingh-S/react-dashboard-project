@@ -11,7 +11,6 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { interpolateTurbo } from 'd3-scale-chromatic';
 import { useMemo } from 'react';
 
 ChartJS.register(
@@ -27,6 +26,12 @@ ChartJS.register(
 const SelfInterestChart = ({ data }) => {
   const theme = useTheme();
 
+  const generateTealColors = (count) => {
+    return Array.from({ length: count }, (_, i) => 
+      `hsl(${180 + (i * 25) % 90}, 75%, ${50 + (i % 4) * 8}%)`
+    );
+  };
+
   const { chartData, options, totalScore } = useMemo(() => {
     const interestedData = data
       .filter(item => item['Self-Interested Candidate']?.toString().toLowerCase() === 'yes')
@@ -34,7 +39,6 @@ const SelfInterestChart = ({ data }) => {
 
     const totalScore = interestedData.reduce((sum, item) => sum + (item['Overall Percentage'] || 0), 0);
 
-    // Adjust bar thickness based on data length
     const dataLength = interestedData.length;
     const isFewData = dataLength <= 5;
     const barThickness = isFewData ? 30 : 'flex';
@@ -45,7 +49,7 @@ const SelfInterestChart = ({ data }) => {
         {
           label: 'Score (%)',
           data: interestedData.map(item => item['Overall Percentage']),
-          backgroundColor: interestedData.map((_, i) => interpolateTurbo(i / interestedData.length)),
+          backgroundColor: generateTealColors(interestedData.length),
           borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
           borderWidth: 1,
           borderRadius: 12,
@@ -177,8 +181,8 @@ const SelfInterestChart = ({ data }) => {
             },
             '&::-webkit-scrollbar-thumb': {
               background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)'
-                : 'linear-gradient(135deg, #5f27cd 0%, #1dd1a1 100%)',
+                ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
+                : 'linear-gradient(135deg, #1976d2, #0288d1)',
               borderRadius: 6
             }
           }}
@@ -198,8 +202,8 @@ const SelfInterestChart = ({ data }) => {
               fontSize: { xs: '14px', md: '16px' },
               fontFamily: "'Montserrat', sans-serif",
               background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(90deg, #ff6b6b, #feca57)'
-                : 'linear-gradient(90deg, #5f27cd, #1dd1a1)',
+                ? 'linear-gradient(90deg, #4a6fa5, #166d67)'
+                : 'linear-gradient(90deg, #1976d2, #0288d1)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
             }}

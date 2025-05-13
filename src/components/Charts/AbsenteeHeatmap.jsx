@@ -11,7 +11,6 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { interpolateRainbow } from 'd3-scale-chromatic';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
 
@@ -32,12 +31,18 @@ const AbsenteeHeatmap = ({ data }) => {
     (a, b) => absenteeData[b].count - absenteeData[a].count
   );
 
+  const generateBlueColors = (count) => {
+    return Array.from({ length: count }, (_, i) => 
+      `hsl(${200 + (i * 30) % 60}, 70%, ${50 + (i % 3) * 10}%)`
+    );
+  };
+
   const chartData = {
     labels: sortedManagers,
     datasets: [{
       label: 'Absentees',
       data: sortedManagers.map(manager => absenteeData[manager].count),
-      backgroundColor: sortedManagers.map((_, i) => interpolateRainbow(i / sortedManagers.length)),
+      backgroundColor: generateBlueColors(sortedManagers.length),
       borderRadius: 10,
       barThickness: 40,
       hoverBorderWidth: 3,
@@ -161,8 +166,8 @@ const AbsenteeHeatmap = ({ data }) => {
           '&::-webkit-scrollbar': { height: 8 },
           '&::-webkit-scrollbar-thumb': {
             background: theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #ff6b6b, #feca57)'
-              : 'linear-gradient(135deg, #5f27cd, #1dd1a1)',
+              ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
+              : 'linear-gradient(135deg, #1976d2, #0288d1)',
             borderRadius: 4
           },
           '&::-webkit-scrollbar-track': {
@@ -184,8 +189,8 @@ const AbsenteeHeatmap = ({ data }) => {
               mt: 2,
               fontWeight: 'bold',
               background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(90deg, #ff6b6b, #feca57)'
-                : 'linear-gradient(90deg, #5f27cd, #1dd1a1)',
+                ? 'linear-gradient(90deg, #4a6fa5, #166d67)'
+                : 'linear-gradient(90deg, #1976d2, #0288d1)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               fontSize: 16

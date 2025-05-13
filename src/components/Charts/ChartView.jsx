@@ -71,119 +71,90 @@ const ChartView = ({ data, onToggleView }) => {
   }, [data, selectedManager]);
 
   const charts = [
-    {
-      title: "Overall Score Distribution",
-      component: <ScoreChart data={filteredData} />,
-    },
-    {
-      title: "Self Interested Candidates",
-      component: <SelfInterestChart data={filteredData} />,
-    },
-    {
-      title: "Absentee Analysis by Manager",
-      component: <AbsenteeHeatmap data={filteredData} />,
-    },
-    {
-      title: "Attendance by Manager",
-      component: <AttendanceChart data={filteredData} />,
-    },
-    {
-      title: "Integrity Scores",
-      component: <IntegrityTable data={filteredData} />,
-    },
+    { title: "Overall Score Distribution", component: <ScoreChart data={filteredData} /> },
+    { title: "Self Interested Candidates", component: <SelfInterestChart data={filteredData} /> },
+    { title: "Absentee Analysis by Manager", component: <AbsenteeHeatmap data={filteredData} /> },
+    { title: "Attendance by Manager", component: <AttendanceChart data={filteredData} /> },
+    { title: "Integrity Scores", component: <IntegrityTable data={filteredData} /> },
   ];
 
-  const handleDownloadPDF = async () => {
-    try {
-      const chartElement = chartRefs.current[currentChart];
-      if (!chartElement) return;
+const handleDownloadPDF = () => {
+  try {
+    const chartWrapper = chartRefs.current[currentChart];
+    if (!chartWrapper) return console.error("Chart wrapper not found.");
 
-      // Temporarily show all content
-      const originalOverflow = chartElement.style.overflow;
-      chartElement.style.overflow = 'visible';
-      chartElement.style.height = 'auto';
+    // Find the canvas inside the chart component
+    const canvas = chartWrapper.querySelector("canvas");
+    if (!canvas) return console.error("Canvas not found inside chart wrapper.");
 
-      // Create canvas with optimal settings
-      const canvas = await html2canvas(chartElement, {
-        scale: 1.5, // Balanced quality and size
-        logging: false,
-        useCORS: true,
-        backgroundColor: theme.palette.background.paper,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: chartElement.scrollWidth,
-        windowHeight: chartElement.scrollHeight,
-      });
+    // Expand the scroll container for full capture
+    const scrollContainer = chartWrapper.querySelector('[data-export-id="score-chart"]');
+    if (scrollContainer) {
+      const originalHeight = scrollContainer.style.height;
+      const originalOverflow = scrollContainer.style.overflow;
 
-      // Restore original styles
-      chartElement.style.overflow = originalOverflow;
-      chartElement.style.height = '';
+      // Temporarily expand the container height
+      scrollContainer.style.height = `${scrollContainer.scrollHeight}px`;
+      scrollContainer.style.overflow = "visible";
 
-      // Calculate PDF dimensions
-      const pdf = new jsPDF('portrait', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 15; // 15mm margins
-      const contentWidth = pageWidth - margin * 2;
+      // Wait a bit for the container to resize before capturing
+      setTimeout(() => {
+        // Convert canvas to image
+        const imgData = canvas.toDataURL("image/png");
 
-      // Calculate image dimensions to fit page
-      const imgRatio = canvas.width / canvas.height;
-      let imgWidth = contentWidth;
-      let imgHeight = imgWidth / imgRatio;
+        // Create PDF
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      // If image is too tall, scale it down
-      const maxHeight = pageHeight - margin * 2 - 20; // 20mm for header/footer
-      if (imgHeight > maxHeight) {
-        imgHeight = maxHeight;
-        imgWidth = imgHeight * imgRatio;
-      }
+        // Add title to the PDF
+        pdf.setFontSize(16);
+        pdf.text(charts[currentChart].title, pdfWidth / 2, 15, { align: "center" });
 
-      // Center the image on the page
-      const xPos = (pageWidth - imgWidth) / 2;
-      const yPos = margin + 10;
+        // Add chart image to the PDF
+        pdf.addImage(imgData, "PNG", 0, 20, pdfWidth, pdfHeight);
 
-      // Add title
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(16);
-      pdf.text(charts[currentChart].title, pageWidth / 2, margin, { align: 'center' });
+        // Add footer with the current date
+        const dateStr = new Date().toLocaleDateString();
+        pdf.setFontSize(10);
+        pdf.text(`Exported on ${dateStr}`, pdfWidth - 15, pdf.internal.pageSize.getHeight() - 10, {
+          align: "right",
+        });
 
-      // Add the image
-      pdf.addImage(
-        canvas.toDataURL('image/jpeg', 0.8), // Use JPEG with 0.8 quality
-        'JPEG',
-        xPos,
-        yPos,
-        imgWidth,
-        imgHeight
-      );
+        // Save the PDF with a sanitized filename
+        const filename = charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, "-");
+        pdf.save(`${filename}.pdf`);
 
-      // Add footer
-      const dateStr = new Date().toLocaleDateString();
-      pdf.setFontSize(10);
-      pdf.setTextColor(100);
-      pdf.text(`Exported on ${dateStr}`, pageWidth - margin, pageHeight - margin, { align: 'right' });
-
-      // Save PDF
-      pdf.save(`${charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, '-')}.pdf`);
-
-    } catch (error) {
-      console.error("Error generating PDF:", error);
+        // Restore the original scroll container height and overflow
+        scrollContainer.style.height = originalHeight;
+        scrollContainer.style.overflow = originalOverflow;
+      }, 300); // Wait 300ms for the container to resize
     }
-  };
+  } catch (err) {
+    console.error("PDF export failed:", err);
+  }
+};
+
+
+
+
+
 
   const navigateChart = (direction) => {
     const newIndex =
       direction === "next"
         ? (currentChart + 1) % charts.length
         : (currentChart - 1 + charts.length) % charts.length;
-
     setCurrentChart(newIndex);
-    chartWrapperRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
+    if (chartWrapperRef.current) {
+      chartWrapperRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
+    }
   };
 
   return (
     <Box sx={{ p: 3, height: "100vh", overflow: "hidden" }}>
-      {/* Header Section */}
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -194,7 +165,6 @@ const ChartView = ({ data, onToggleView }) => {
           gap: 2,
         }}
       >
-        {/* Title Section */}
         <Box
           sx={{
             display: "flex",
@@ -203,14 +173,7 @@ const ChartView = ({ data, onToggleView }) => {
             minWidth: isTablet ? "200px" : "300px",
           }}
         >
-          <Avatar
-            sx={{
-              bgcolor: "primary.main",
-              width: 48,
-              height: 48,
-              mr: 2,
-            }}
-          >
+          <Avatar sx={{ bgcolor: "primary.main", width: 48, height: 48, mr: 2 }}>
             <FiPieChart />
           </Avatar>
           <Typography
@@ -226,118 +189,71 @@ const ChartView = ({ data, onToggleView }) => {
           </Typography>
         </Box>
 
-        {/* Controls Section */}
         <Box
           sx={{
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
             gap: 2,
             width: isMobile ? "100%" : "auto",
-            alignItems: "stretch",
           }}
         >
           <Button
             variant="outlined"
             onClick={onToggleView}
             sx={{
-              height: "36px",
-              minWidth: isMobile ? "50%" : "120px",
+              height: 36,
+              minWidth: isMobile ? "50%" : 120,
               textTransform: "none",
-              flex: isMobile ? 1 : "none",
               fontWeight: "bold",
               color: "#1976d2",
               borderColor: "#1976d2",
               backgroundColor: "#ffffff",
-              transition: "all 0.3s ease",
-              "&:hover": {
+              '&:hover': {
                 backgroundColor: "#1976d2",
                 color: "#ffffff",
-                borderColor: "#1976d2",
                 boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
-              },
-              "&:active": {
-                backgroundColor: "#115293",
-                borderColor: "#115293",
-                boxShadow: "none",
               },
             }}
           >
             Back to Table
           </Button>
-
-          {/* Manager Filter */}
-          <FormControl
-            size="small"
-            sx={{
-              minWidth: isMobile ? "100%" : 180,
-              "& .MuiSelect-select": {
-                py: "8px",
-              },
-            }}
-          >
+          <FormControl size="small" sx={{ minWidth: isMobile ? "100%" : 180 }}>
             <Select
               value={selectedManager}
               onChange={(e) => setSelectedManager(e.target.value)}
               sx={{
-                height: "36px",
+                height: 36,
                 backgroundColor: theme.palette.primary.main,
                 color: theme.palette.primary.contrastText,
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.primary.main,
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.primary.dark,
-                },
               }}
             >
               {managers.map((manager) => (
-                <MenuItem
-                  key={manager}
-                  value={manager}
-                  sx={{
-                    "&.Mui-selected": {
-                      backgroundColor: `${theme.palette.primary.light} !important`,
-                    },
-                  }}
-                >
+                <MenuItem key={manager} value={manager}>
                   {manager}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-
-          {/* Export PDF Button */}
           <Button
             variant="contained"
             startIcon={<FiDownload />}
             onClick={handleDownloadPDF}
-            sx={{
-              height: "36px",
-              minWidth: isMobile ? "50%" : "120px",
-              textTransform: "none",
-              flex: isMobile ? 1 : "none",
-            }}
+            sx={{ height: 36, minWidth: isMobile ? "50%" : 120, textTransform: "none" }}
           >
             Export PDF
           </Button>
         </Box>
       </Box>
 
-      {/* Chart Container */}
+      {/* Chart Display */}
       <Box sx={{ position: "relative" }}>
         <ChartContainer>
           <ChartWrapper ref={chartWrapperRef}>
             {charts.map((chart, index) => (
               <Box
                 key={index}
-                id={`chart-${index}`}
-                ref={el => chartRefs.current[index] = el}
-                sx={{
-                  minWidth: "100%",
-                  height: "100%",
-                  p: 3,
-                  boxSizing: "border-box",
-                }}
+                ref={(el) => (chartRefs.current[index] = el)}
+                sx={{ minWidth: "100%", height: "100%", p: 2 }}
               >
                 {chart.component}
               </Box>
@@ -345,73 +261,28 @@ const ChartView = ({ data, onToggleView }) => {
           </ChartWrapper>
         </ChartContainer>
 
-        {/* Navigation Arrows */}
         <IconButton
           onClick={() => navigateChart("prev")}
           sx={{
             position: "absolute",
-            left: 10,
             top: "50%",
+            left: 10,
             transform: "translateY(-50%)",
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: theme.shadows[2],
-            "&:hover": {
-              backgroundColor: theme.palette.grey[200],
-            },
           }}
         >
           <FiChevronLeft />
         </IconButton>
-
         <IconButton
           onClick={() => navigateChart("next")}
           sx={{
             position: "absolute",
-            right: 10,
             top: "50%",
+            right: 10,
             transform: "translateY(-50%)",
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: theme.shadows[2],
-            "&:hover": {
-              backgroundColor: theme.palette.grey[200],
-            },
           }}
         >
           <FiChevronRight />
         </IconButton>
-      </Box>
-
-      {/* Navigation Dots */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          mt: 2,
-          gap: 1,
-        }}
-      >
-        {charts.map((_, index) => (
-          <Box
-            key={index}
-            onClick={() => {
-              setCurrentChart(index);
-              chartWrapperRef.current.style.transform = `translateX(-${
-                index * 100
-              }%)`;
-            }}
-            sx={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              backgroundColor:
-                currentChart === index
-                  ? theme.palette.primary.main
-                  : theme.palette.grey[400],
-              cursor: "pointer",
-              transition: "background-color 0.3s",
-            }}
-          />
-        ))}
       </Box>
     </Box>
   );
