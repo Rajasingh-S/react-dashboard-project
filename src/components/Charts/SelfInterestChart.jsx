@@ -1,6 +1,9 @@
+// SelfInterestChart.jsx
+import { useRef, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Box, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,7 +14,6 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { useMemo } from 'react';
 
 ChartJS.register(
   CategoryScale,
@@ -23,11 +25,41 @@ ChartJS.register(
   ChartDataLabels
 );
 
-const SelfInterestChart = ({ data }) => {
+const SelfInterestChart = forwardRef(({ data }, ref) => {
   const theme = useTheme();
+  const chartRef = useRef();
+
+  useImperativeHandle(ref, () => ({
+    downloadPDF: async () => {
+      const canvasContainer = chartRef.current;
+      const originalOverflow = canvasContainer.style.overflow;
+      const originalHeight = canvasContainer.style.height;
+
+      canvasContainer.style.overflow = 'visible';
+      canvasContainer.style.height = 'auto';
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const canvas = await html2canvas(canvasContainer, {
+        scrollY: -window.scrollY,
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('l', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('SelfInterestChart.pdf');
+
+      canvasContainer.style.overflow = originalOverflow;
+      canvasContainer.style.height = originalHeight;
+    }
+  }));
 
   const generateTealColors = (count) => {
-    return Array.from({ length: count }, (_, i) => 
+    return Array.from({ length: count }, (_, i) =>
       `hsl(${180 + (i * 25) % 90}, 75%, ${50 + (i % 4) * 8}%)`
     );
   };
@@ -39,8 +71,7 @@ const SelfInterestChart = ({ data }) => {
 
     const totalScore = interestedData.reduce((sum, item) => sum + (item['Overall Percentage'] || 0), 0);
 
-    const dataLength = interestedData.length;
-    const isFewData = dataLength <= 5;
+    const isFewData = interestedData.length <= 5;
     const barThickness = isFewData ? 30 : 'flex';
 
     const chartData = {
@@ -64,24 +95,15 @@ const SelfInterestChart = ({ data }) => {
       indexAxis: 'x',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: { top: 20, right: 20, bottom: 20, left: 20 }
-      },
-      animation: {
-        duration: 1200,
-        easing: 'easeOutBack'
-      },
+      layout: { padding: 20 },
+      animation: { duration: 1200, easing: 'easeOutBack' },
       plugins: {
         legend: { display: false },
         datalabels: {
           anchor: 'end',
           align: 'end',
           color: theme.palette.text.primary,
-          font: {
-            size: 12,
-            weight: 'bold',
-            family: "'Montserrat', sans-serif"
-          },
+          font: { size: 12, weight: 'bold', family: "'Montserrat', sans-serif" },
           formatter: value => `${value}%`,
         },
         tooltip: {
@@ -92,8 +114,8 @@ const SelfInterestChart = ({ data }) => {
           borderWidth: 1,
           padding: 12,
           cornerRadius: 10,
-          titleFont: { size: 14, weight: 'bold', family: "'Montserrat', sans-serif" },
-          bodyFont: { size: 12, family: "'Montserrat', sans-serif" },
+          titleFont: { size: 14, weight: 'bold' },
+          bodyFont: { size: 12 },
           callbacks: {
             label: context => {
               const item = interestedData[context.dataIndex];
@@ -119,7 +141,7 @@ const SelfInterestChart = ({ data }) => {
             display: true,
             text: 'Candidates',
             color: theme.palette.primary.main,
-            font: { size: 14, weight: 'bold', family: "'Montserrat', sans-serif" }
+            font: { size: 14, weight: 'bold' }
           }
         },
         y: {
@@ -131,13 +153,13 @@ const SelfInterestChart = ({ data }) => {
           },
           ticks: {
             color: theme.palette.text.secondary,
-            font: { size: 12, weight: 'bold', family: "'Montserrat', sans-serif" }
+            font: { size: 12, weight: 'bold' }
           },
           title: {
             display: true,
             text: 'Score (%)',
             color: theme.palette.primary.main,
-            font: { size: 14, weight: 'bold', family: "'Montserrat', sans-serif" }
+            font: { size: 14, weight: 'bold' }
           }
         }
       }
@@ -147,73 +169,15 @@ const SelfInterestChart = ({ data }) => {
   }, [data, theme]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
-    >
-      <Box
-        sx={{
-          width: '100%',
-          height: { xs: '500px', md: 'calc(100vh - 180px)' },
-          background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)'
-            : 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          borderRadius: 3,
-          boxShadow: theme.shadows[10],
-          p: 3,
-          overflow: 'hidden',
-          border: theme.palette.mode === 'dark'
-            ? '1px solid rgba(255,255,255,0.1)'
-            : '1px solid rgba(0,0,0,0.1)'
-        }}
-      >
-        <Box
-          sx={{
-            height: '100%',
-            width: '100%',
-            position: 'relative',
-            overflow: 'auto',
-            '& canvas': { minHeight: { xs: '300px', md: '500px' } },
-            '&::-webkit-scrollbar': {
-              width: 6,
-              height: 6
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
-                : 'linear-gradient(135deg, #1976d2, #0288d1)',
-              borderRadius: 6
-            }
-          }}
-        >
-          <Bar data={chartData} options={options} />
-        </Box>
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Box
-            sx={{
-              mt: 3,
-              textAlign: 'right',
-              fontWeight: 'bold',
-              fontSize: { xs: '14px', md: '16px' },
-              fontFamily: "'Montserrat', sans-serif",
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(90deg, #4a6fa5, #166d67)'
-                : 'linear-gradient(90deg, #1976d2, #0288d1)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            Total Combined Score: {totalScore.toFixed(2)}%
-          </Box>
-        </motion.div>
+    <Box ref={chartRef} sx={{ width: '100%', p: 2 }}>
+      <Box sx={{ width: '100%', height: '500px', overflow: 'auto' }}>
+        <Bar data={chartData} options={options} />
       </Box>
-    </motion.div>
+      <Box sx={{ mt: 2, textAlign: 'right', fontWeight: 'bold' }}>
+        Total Combined Score: {totalScore.toFixed(2)}%
+      </Box>
+    </Box>
   );
-};
+});
 
 export default SelfInterestChart;

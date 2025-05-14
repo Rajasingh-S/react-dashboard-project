@@ -19,7 +19,6 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import ScoreChart from "./ScoreChart";
 import SelfInterestChart from "./SelfInterestChart";
@@ -78,68 +77,54 @@ const ChartView = ({ data, onToggleView }) => {
     { title: "Integrity Scores", component: <IntegrityTable data={filteredData} /> },
   ];
 
-const handleDownloadPDF = () => {
-  try {
-    const chartWrapper = chartRefs.current[currentChart];
-    if (!chartWrapper) return console.error("Chart wrapper not found.");
+  const handleDownloadPDF = () => {
+    try {
+      const chartWrapper = chartRefs.current[currentChart];
+      if (!chartWrapper) return console.error("Chart wrapper not found.");
 
-    // Find the canvas inside the chart component
-    const canvas = chartWrapper.querySelector("canvas");
-    if (!canvas) return console.error("Canvas not found inside chart wrapper.");
+      const canvas = chartWrapper.querySelector("canvas");
+      if (!canvas) return console.error("Canvas not found inside chart wrapper.");
 
-    // Expand the scroll container for full capture
-    const scrollContainer = chartWrapper.querySelector('[data-export-id="score-chart"]');
-    if (scrollContainer) {
+      const scrollContainer = chartWrapper.querySelector('[data-export-id="score-chart"]') || canvas.parentElement;
+
       const originalHeight = scrollContainer.style.height;
       const originalOverflow = scrollContainer.style.overflow;
 
-      // Temporarily expand the container height
       scrollContainer.style.height = `${scrollContainer.scrollHeight}px`;
       scrollContainer.style.overflow = "visible";
 
-      // Wait a bit for the container to resize before capturing
       setTimeout(() => {
-        // Convert canvas to image
         const imgData = canvas.toDataURL("image/png");
 
-        // Create PDF
         const pdf = new jsPDF("p", "mm", "a4");
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const imgProps = pdf.getImageProperties(imgData);
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-        // Add title to the PDF
+        // Title
         pdf.setFontSize(16);
         pdf.text(charts[currentChart].title, pdfWidth / 2, 15, { align: "center" });
 
-        // Add chart image to the PDF
+        // Chart Image
         pdf.addImage(imgData, "PNG", 0, 20, pdfWidth, pdfHeight);
 
-        // Add footer with the current date
+        // Footer
         const dateStr = new Date().toLocaleDateString();
         pdf.setFontSize(10);
         pdf.text(`Exported on ${dateStr}`, pdfWidth - 15, pdf.internal.pageSize.getHeight() - 10, {
           align: "right",
         });
 
-        // Save the PDF with a sanitized filename
         const filename = charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, "-");
         pdf.save(`${filename}.pdf`);
 
-        // Restore the original scroll container height and overflow
         scrollContainer.style.height = originalHeight;
         scrollContainer.style.overflow = originalOverflow;
-      }, 300); // Wait 300ms for the container to resize
+      }, 300);
+    } catch (err) {
+      console.error("PDF export failed:", err);
     }
-  } catch (err) {
-    console.error("PDF export failed:", err);
-  }
-};
-
-
-
-
-
+  };
 
   const navigateChart = (direction) => {
     const newIndex =
