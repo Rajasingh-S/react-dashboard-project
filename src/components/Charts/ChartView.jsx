@@ -20,6 +20,7 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import ScoreChart from "./ScoreChart";
 import SelfInterestChart from "./SelfInterestChart";
 import AbsenteeHeatmap from "./AbsenteeHeatmap";
@@ -77,50 +78,69 @@ const ChartView = ({ data, onToggleView }) => {
     { title: "Integrity Scores", component: <IntegrityTable data={filteredData} /> },
   ];
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     try {
       const chartWrapper = chartRefs.current[currentChart];
       if (!chartWrapper) return console.error("Chart wrapper not found.");
 
-      const canvas = chartWrapper.querySelector("canvas");
-      if (!canvas) return console.error("Canvas not found inside chart wrapper.");
+      // Special handling for SelfInterestChart
+      if (currentChart === 1) {
+        const chartComponent = chartWrapper.querySelector('div[data-pdf-export]');
+        if (chartComponent && chartComponent._reactInternals) {
+          const instance = chartComponent._reactInternals.child.stateNode;
+          if (instance && typeof instance.downloadPDF === 'function') {
+            await instance.downloadPDF();
+            return;
+          }
+        }
+      }
 
-      const scrollContainer = chartWrapper.querySelector('[data-export-id="score-chart"]') || canvas.parentElement;
-
-      const originalHeight = scrollContainer.style.height;
+      const scrollContainer = chartWrapper.querySelector('[data-export-container]') || chartWrapper;
+      
       const originalOverflow = scrollContainer.style.overflow;
+      const originalHeight = scrollContainer.style.height;
+      
+      scrollContainer.style.overflow = 'visible';
+      scrollContainer.style.height = 'auto';
 
-      scrollContainer.style.height = `${scrollContainer.scrollHeight}px`;
-      scrollContainer.style.overflow = "visible";
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      setTimeout(() => {
-        const imgData = canvas.toDataURL("image/png");
+      const canvas = await html2canvas(scrollContainer, {
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+        useCORS: true,
+        scale: 2,
+        logging: false,
+        allowTaint: true
+      });
 
-        const pdf = new jsPDF("p", "mm", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF({
+        orientation: currentChart === 0 ? 'portrait' : 'landscape',
+        unit: 'mm'
+      });
 
-        // Title
-        pdf.setFontSize(16);
-        pdf.text(charts[currentChart].title, pdfWidth / 2, 15, { align: "center" });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        // Chart Image
-        pdf.addImage(imgData, "PNG", 0, 20, pdfWidth, pdfHeight);
+      pdf.setFontSize(16);
+      pdf.setTextColor(40);
+      pdf.text(charts[currentChart].title, pdfWidth / 2, 15, { align: "center" });
 
-        // Footer
-        const dateStr = new Date().toLocaleDateString();
-        pdf.setFontSize(10);
-        pdf.text(`Exported on ${dateStr}`, pdfWidth - 15, pdf.internal.pageSize.getHeight() - 10, {
-          align: "right",
-        });
+      pdf.addImage(imgData, 'PNG', 0, 20, pdfWidth, pdfHeight - 20);
 
-        const filename = charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, "-");
-        pdf.save(`${filename}.pdf`);
+      const dateStr = new Date().toLocaleDateString();
+      pdf.setFontSize(10);
+      pdf.setTextColor(150);
+      pdf.text(`Exported on ${dateStr}`, pdfWidth - 15, pdf.internal.pageSize.getHeight() - 10, {
+        align: "right"
+      });
 
-        scrollContainer.style.height = originalHeight;
-        scrollContainer.style.overflow = originalOverflow;
-      }, 300);
+      const filename = charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, "-");
+      pdf.save(`${filename}.pdf`);
+
+      scrollContainer.style.overflow = originalOverflow;
+      scrollContainer.style.height = originalHeight;
     } catch (err) {
       console.error("PDF export failed:", err);
     }
@@ -139,7 +159,6 @@ const ChartView = ({ data, onToggleView }) => {
 
   return (
     <Box sx={{ p: 3, height: "100vh", overflow: "hidden" }}>
-      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -230,7 +249,6 @@ const ChartView = ({ data, onToggleView }) => {
         </Box>
       </Box>
 
-      {/* Chart Display */}
       <Box sx={{ position: "relative" }}>
         <ChartContainer>
           <ChartWrapper ref={chartWrapperRef}>

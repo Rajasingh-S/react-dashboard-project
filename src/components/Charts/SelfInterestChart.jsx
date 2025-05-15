@@ -1,4 +1,3 @@
-// SelfInterestChart.jsx
 import { useRef, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Box, useTheme } from '@mui/material';
@@ -42,7 +41,10 @@ const SelfInterestChart = forwardRef(({ data }, ref) => {
 
       const canvas = await html2canvas(canvasContainer, {
         scrollY: -window.scrollY,
-        useCORS: true
+        useCORS: true,
+        scale: 2,
+        logging: false,
+        allowTaint: true
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -50,7 +52,19 @@ const SelfInterestChart = forwardRef(({ data }, ref) => {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.setFontSize(16);
+      pdf.setTextColor(40);
+      pdf.text('Self Interested Candidates', pdfWidth / 2, 15, { align: "center" });
+
+      pdf.addImage(imgData, 'PNG', 0, 20, pdfWidth, pdfHeight - 20);
+
+      const dateStr = new Date().toLocaleDateString();
+      pdf.setFontSize(10);
+      pdf.setTextColor(150);
+      pdf.text(`Exported on ${dateStr}`, pdfWidth - 15, pdf.internal.pageSize.getHeight() - 10, {
+        align: "right"
+      });
+
       pdf.save('SelfInterestChart.pdf');
 
       canvasContainer.style.overflow = originalOverflow;
@@ -169,11 +183,70 @@ const SelfInterestChart = forwardRef(({ data }, ref) => {
   }, [data, theme]);
 
   return (
-    <Box ref={chartRef} sx={{ width: '100%', p: 2 }}>
-      <Box sx={{ width: '100%', height: '500px', overflow: 'auto' }}>
-        <Bar data={chartData} options={options} />
+    <Box 
+      ref={chartRef} 
+      data-pdf-export
+      sx={{ 
+        width: '100%',
+        height: 'calc(100vh - 180px)',
+        p: 2,
+        background: theme.palette.mode === 'dark'
+          ? 'linear-gradient(135deg, #1a1a2e, #16213e)'
+          : 'linear-gradient(135deg, #f5f7fa, #e4e8f0)',
+        borderRadius: 3,
+        boxShadow: theme.shadows[3],
+        overflow: 'hidden'
+      }}
+    >
+      <Box sx={{ 
+        width: '100%',
+        height: '100%',
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          width: 10,
+          height: 10
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
+            : 'linear-gradient(135deg, #1976d2, #0288d1)',
+          borderRadius: 10,
+          border: theme.palette.mode === 'dark'
+            ? '1px solid rgba(255,255,255,0.1)'
+            : '1px solid rgba(255,255,255,0.3)'
+        },
+        '&::-webkit-scrollbar-track': {
+          background: theme.palette.mode === 'dark'
+            ? 'rgba(255,255,255,0.05)'
+            : 'rgba(0,0,0,0.05)',
+          borderRadius: 10
+        },
+        '&::-webkit-scrollbar-corner': {
+          background: 'transparent'
+        }
+      }}>
+        <Box sx={{ 
+          minWidth: 'fit-content',
+          minHeight: 'fit-content',
+          padding: 1
+        }}>
+          <Bar 
+            data={chartData} 
+            options={options} 
+            style={{ 
+              minWidth: Math.max(chartData.labels.length * 100, 800),
+              minHeight: 500 
+            }}
+          />
+        </Box>
       </Box>
-      <Box sx={{ mt: 2, textAlign: 'right', fontWeight: 'bold' }}>
+      <Box sx={{ 
+        mt: 2, 
+        textAlign: 'right', 
+        fontWeight: 'bold',
+        color: theme.palette.text.primary,
+        fontFamily: "'Montserrat', sans-serif"
+      }}>
         Total Combined Score: {totalScore.toFixed(2)}%
       </Box>
     </Box>

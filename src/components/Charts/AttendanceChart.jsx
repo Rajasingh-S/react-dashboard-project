@@ -185,21 +185,48 @@ const AttendanceChart = ({ data = [] }) => {
             : '1px solid rgba(0,0,0,0.1)'
         }}
       >
-        <Box
-          sx={{
-            width: '100%',
-            height: '100%',
-            overflow: 'auto',
-            '&::-webkit-scrollbar': { width: '8px' },
-            '&::-webkit-scrollbar-thumb': {
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
-                : 'linear-gradient(135deg, #1976d2, #0288d1)',
-              borderRadius: 10,
-            }
-          }}
-        >
-          <Bar data={chartData} options={chartOptions} plugins={[valueLabelPlugin]} />
+        <Box data-export-container sx={{
+          width: '100%',
+          height: '100%',
+          overflow: 'auto',
+          '&::-webkit-scrollbar': { 
+            width: 10,
+            height: 10
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: theme.palette.mode === 'dark'
+              ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
+              : 'linear-gradient(135deg, #1976d2, #0288d1)',
+            borderRadius: 10,
+            border: theme.palette.mode === 'dark'
+              ? '1px solid rgba(255,255,255,0.1)'
+              : '1px solid rgba(255,255,255,0.3)'
+          },
+          '&::-webkit-scrollbar-track': {
+            background: theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.05)'
+              : 'rgba(0,0,0,0.05)',
+            borderRadius: 10
+          },
+          '&::-webkit-scrollbar-corner': {
+            background: 'transparent'
+          }
+        }}>
+          <Box sx={{ 
+            minWidth: 'fit-content',
+            minHeight: 'fit-content',
+            padding: 1
+          }}>
+            <Bar 
+              data={chartData} 
+              options={chartOptions} 
+              plugins={[valueLabelPlugin]}
+              style={{ 
+                minWidth: Math.max(chartData.labels.length * 100, 800),
+                minHeight: 500 
+              }}
+            />
+          </Box>
         </Box>
       </Box>
     </motion.div>

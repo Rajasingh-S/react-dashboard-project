@@ -14,10 +14,10 @@ import {
   Avatar
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { getInitials } from './chartUtils';
 
-const IntegrityTable = ({ data }) => {
+const IntegrityTable = forwardRef(({ data }, ref) => {
   const theme = useTheme();
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('Integrity Score (out of 10)');
@@ -41,6 +41,8 @@ const IntegrityTable = ({ data }) => {
       transition={{ duration: 0.6, delay: 0.3 }}
     >
       <Paper
+        ref={ref}
+        data-export-container
         elevation={3}
         sx={{
           p: 4,
@@ -48,10 +50,8 @@ const IntegrityTable = ({ data }) => {
           background: theme.palette.mode === 'dark' 
             ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' 
             : 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          height: 'calc(100vh - 200px)',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden',
           boxShadow: theme.shadows[10],
           border: theme.palette.mode === 'dark' 
             ? '1px solid rgba(255,255,255,0.1)' 
@@ -74,29 +74,9 @@ const IntegrityTable = ({ data }) => {
         >
           Integrity Scores Overview
         </Typography>
-        <TableContainer 
-          component={Box}
-          sx={{ 
-            flex: 1,
-            overflow: 'auto',
-            position: 'relative',
-            '&::-webkit-scrollbar': {
-              height: '10px',
-              width: '10px',
-              borderRadius: '10px'
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: theme.palette.mode === 'dark' 
-                ? 'linear-gradient(135deg, #4a6fa5 0%, #166d67 100%)' 
-                : 'linear-gradient(135deg, #1976d2 0%, #0288d1 100%)',
-              borderRadius: '10px'
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: theme.palette.mode === 'dark' 
-                ? 'rgba(255,255,255,0.05)' 
-                : 'rgba(0,0,0,0.05)'
-            }
-          }}
+
+        <TableContainer
+          sx={{ maxHeight: '60vh' }}
         >
           <Table 
             stickyHeader 
@@ -104,7 +84,8 @@ const IntegrityTable = ({ data }) => {
             aria-label="integrity table"
             sx={{
               minWidth: 'max-content',
-              tableLayout: 'fixed'
+              tableLayout: 'fixed',
+              background: theme.palette.background.paper
             }}
           >
             <TableHead>
@@ -304,6 +285,7 @@ const IntegrityTable = ({ data }) => {
             </TableBody>
           </Table>
         </TableContainer>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -325,6 +307,6 @@ const IntegrityTable = ({ data }) => {
       </Paper>
     </motion.div>
   );
-};
+});
 
 export default IntegrityTable;

@@ -168,24 +168,35 @@ const ScoreChart = ({ data }) => {
       >
         <Box
           ref={containerRef}
-          data-export-id="score-chart"
+          data-export-container
           sx={{
             flex: 1,
             width: '100%',
             overflow: 'auto',
             '&::-webkit-scrollbar': {
-              width: '6px',
-              height: '6px',
+              width: 10,
+              height: 10,
             },
             '&::-webkit-scrollbar-thumb': {
               backgroundColor: theme.palette.primary.main,
-              borderRadius: '4px',
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.primary.contrastText}`
             },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.05)',
+              borderRadius: 4
+            },
+            '&::-webkit-scrollbar-corner': {
+              background: 'transparent'
+            }
           }}
         >
           <Box
             sx={{
               minHeight: `${chartHeight}px`,
+              minWidth: `${nameAreaWidth + 600}px`,
               position: 'relative',
               paddingBottom: '20px'
             }}

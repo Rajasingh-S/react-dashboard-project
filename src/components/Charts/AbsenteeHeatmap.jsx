@@ -160,23 +160,46 @@ const AbsenteeHeatmap = ({ data }) => {
           ? '1px solid rgba(255,255,255,0.1)'
           : '1px solid rgba(0,0,0,0.1)'
       }}>
-        <Box sx={{
+        <Box data-export-container sx={{
           height: '100%',
           overflow: 'auto',
-          '&::-webkit-scrollbar': { height: 8 },
+          '&::-webkit-scrollbar': { 
+            width: 10,
+            height: 10
+          },
           '&::-webkit-scrollbar-thumb': {
             background: theme.palette.mode === 'dark'
               ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
               : 'linear-gradient(135deg, #1976d2, #0288d1)',
-            borderRadius: 4
+            borderRadius: 4,
+            border: theme.palette.mode === 'dark'
+              ? '1px solid rgba(255,255,255,0.1)'
+              : '1px solid rgba(255,255,255,0.3)'
           },
           '&::-webkit-scrollbar-track': {
             background: theme.palette.mode === 'dark'
               ? 'rgba(255,255,255,0.05)'
-              : 'rgba(0,0,0,0.05)'
+              : 'rgba(0,0,0,0.05)',
+            borderRadius: 4
+          },
+          '&::-webkit-scrollbar-corner': {
+            background: 'transparent'
           }
         }}>
-          <Bar data={chartData} options={options} />
+          <Box sx={{ 
+            minWidth: 'fit-content',
+            minHeight: 'fit-content',
+            padding: 1
+          }}>
+            <Bar 
+              data={chartData} 
+              options={options} 
+              style={{ 
+                minWidth: Math.max(sortedManagers.length * 100, 800),
+                minHeight: 500 
+              }} 
+            />
+          </Box>
         </Box>
         <motion.div
           initial={{ y: 20, opacity: 0 }}
