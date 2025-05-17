@@ -83,18 +83,56 @@ const ChartView = ({ data, onToggleView }) => {
       const chartWrapper = chartRefs.current[currentChart];
       if (!chartWrapper) return console.error("Chart wrapper not found.");
 
-      // Special handling for SelfInterestChart
-      if (currentChart === 1) {
-        const chartComponent = chartWrapper.querySelector('div[data-pdf-export]');
-        if (chartComponent && chartComponent._reactInternals) {
-          const instance = chartComponent._reactInternals.child.stateNode;
-          if (instance && typeof instance.downloadPDF === 'function') {
-            await instance.downloadPDF();
-            return;
-          }
-        }
+      // Special handling for IntegrityTable (index 4)
+      if (currentChart === 4) {
+        const container = chartWrapper.querySelector('[data-export-container]');
+        if (!container) return;
+
+        const originalStyles = {
+          overflow: container.style.overflow,
+          height: container.style.height,
+          position: container.style.position
+        };
+
+        // Force show all content
+        container.style.overflow = 'visible';
+        container.style.height = 'auto';
+        container.style.position = 'relative';
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const canvas = await html2canvas(container, {
+          scrollY: -window.scrollY,
+          useCORS: true,
+          scale: 2,
+          logging: false,
+          allowTaint: true,
+          width: container.scrollWidth,
+          height: container.scrollHeight,
+          windowWidth: container.scrollWidth,
+          windowHeight: container.scrollHeight
+        });
+
+        const pdf = new jsPDF('l', 'mm', [
+          canvas.width * 0.264583, 
+          canvas.height * 0.264583
+        ]);
+
+        pdf.addImage(canvas, 'PNG', 0, 0, 
+          pdf.internal.pageSize.getWidth(), 
+          pdf.internal.pageSize.getHeight()
+        );
+
+        // Restore original styles
+        container.style.overflow = originalStyles.overflow;
+        container.style.height = originalStyles.height;
+        container.style.position = originalStyles.position;
+
+        pdf.save('Integrity-Table.pdf');
+        return;
       }
 
+      // Default handling for other charts
       const scrollContainer = chartWrapper.querySelector('[data-export-container]') || chartWrapper;
       
       const originalOverflow = scrollContainer.style.overflow;

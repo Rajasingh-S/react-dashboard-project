@@ -14,13 +14,21 @@ import {
   Avatar
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useRef, useEffect } from 'react';
 import { getInitials } from './chartUtils';
 
 const IntegrityTable = forwardRef(({ data }, ref) => {
   const theme = useTheme();
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('Integrity Score (out of 10)');
+  const containerRef = useRef(null);
+  const tableRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current && tableRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, [data]);
 
   const handleSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -50,12 +58,15 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
           background: theme.palette.mode === 'dark' 
             ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' 
             : 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          display: 'flex',
-          flexDirection: 'column',
           boxShadow: theme.shadows[10],
           border: theme.palette.mode === 'dark' 
             ? '1px solid rgba(255,255,255,0.1)' 
-            : '1px solid rgba(0,0,0,0.1)'
+            : '1px solid rgba(0,0,0,0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: 'calc(100vh - 180px)',
+          overflow: 'hidden'
         }}
       >
         <Typography 
@@ -75,15 +86,40 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
           Integrity Scores Overview
         </Typography>
 
-        <TableContainer
-          sx={{ maxHeight: '60vh' }}
+        <Box
+          ref={containerRef}
+          sx={{
+            flex: 1,
+            width: '100%',
+            overflow: 'auto',
+            '&::-webkit-scrollbar': {
+              width: 10,
+              height: 10,
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: theme.palette.primary.main,
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.primary.contrastText}`
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.05)',
+              borderRadius: 4
+            },
+            '&::-webkit-scrollbar-corner': {
+              background: 'transparent'
+            }
+          }}
         >
           <Table 
+            ref={tableRef}
             stickyHeader 
             size="small" 
             aria-label="integrity table"
             sx={{
               minWidth: 'max-content',
+              width: '100%',
               tableLayout: 'fixed',
               background: theme.palette.background.paper
             }}
@@ -103,7 +139,8 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
                     fontFamily: "'Montserrat', sans-serif",
                     borderBottom: 'none',
                     zIndex: 2,
-                    minWidth: '250px'
+                    minWidth: 300,
+                    width: 300
                   }}
                 >
                   Candidate
@@ -124,7 +161,8 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
                       fontFamily: "'Montserrat', sans-serif",
                       borderBottom: 'none',
                       zIndex: 2,
-                      minWidth: '180px'
+                      minWidth: 200,
+                      width: 200
                     }}
                   >
                     <TableSortLabel
@@ -168,7 +206,8 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
                       backgroundColor: index % 2 === 0
                         ? theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'
                         : 'transparent',
-                      minWidth: '250px'
+                      minWidth: 300,
+                      width: 300
                     }}
                   >
                     <Avatar
@@ -203,7 +242,8 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
                       backgroundColor: index % 2 === 0
                         ? theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'
                         : 'transparent',
-                      minWidth: '180px'
+                      minWidth: 200,
+                      width: 200
                     }}
                   >
                     <Box
@@ -249,7 +289,8 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
                       backgroundColor: index % 2 === 0
                         ? theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'
                         : 'transparent',
-                      minWidth: '180px'
+                      minWidth: 200,
+                      width: 200
                     }}
                   >
                     <Box
@@ -284,7 +325,7 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </Box>
 
         <motion.div
           initial={{ opacity: 0 }}
