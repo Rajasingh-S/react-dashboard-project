@@ -1,4 +1,5 @@
-import { useState, useRef, useMemo } from "react";
+// D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
+import React, { useState, useRef, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -7,324 +8,228 @@ import {
   Button,
   useTheme,
   IconButton,
-  styled,
   FormControl,
   Select,
   MenuItem,
   useMediaQuery,
-} from "@mui/material";
-import {
-  FiDownload,
-  FiPieChart,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import ScoreChart from "./ScoreChart";
-import SelfInterestChart from "./SelfInterestChart";
-import AbsenteeHeatmap from "./AbsenteeHeatmap";
-import AttendanceChart from "./AttendanceChart";
-import IntegrityTable from "./IntegrityTable";
-
-const ChartContainer = styled(Paper)(({ theme }) => ({
-  width: "100%",
-  height: "calc(100vh - 180px)",
-  overflow: "hidden",
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[2],
-  backgroundColor: theme.palette.background.paper,
-}));
-
-const ChartWrapper = styled(Box)({
-  width: "100%",
-  height: "100%",
-  display: "flex",
-  transition: "transform 0.3s ease",
-});
+  LinearProgress
+} from '@mui/material';
+import { FiDownload, FiPieChart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { usePromiseTracker, trackPromise } from 'react-promise-tracker';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PDFExportManager } from '../../utils/pdfExport';
+import ScoreChart from './ScoreChart';
+import SelfInterestChart from './SelfInterestChart';
+import AbsenteeHeatmap from './AbsenteeHeatmap';
+import AttendanceChart from './AttendanceChart';
+import IntegrityTable from './IntegrityTable';
 
 const ChartView = ({ data, onToggleView }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery("(max-width:600px)");
-  const isTablet = useMediaQuery("(max-width:900px)");
+  const { promiseInProgress } = usePromiseTracker();
   const [currentChart, setCurrentChart] = useState(0);
-  const [selectedManager, setSelectedManager] = useState("All Managers");
-  const chartWrapperRef = useRef(null);
+  const [selectedManager, setSelectedManager] = useState('All Managers');
   const chartRefs = useRef([]);
 
-  const managers = useMemo(() => {
-    const managerSet = new Set();
-    data.forEach((item) => {
-      const manager = item.Manager?.trim() || "Unknown";
-      managerSet.add(manager);
-    });
-    return ["All Managers", ...Array.from(managerSet).sort()];
-  }, [data]);
+  const managers = useMemo(() => [
+    'All Managers',
+    ...new Set(data.map(item => item.Manager?.trim() || 'Unknown'))
+  ], [data]);
 
-  const filteredData = useMemo(() => {
-    if (selectedManager === "All Managers") return data;
-    return data.filter((item) => {
-      const manager = item.Manager?.trim() || "Unknown";
-      return manager === selectedManager;
-    });
-  }, [data, selectedManager]);
+  const filteredData = useMemo(() => (
+    selectedManager === 'All Managers' 
+      ? data 
+      : data.filter(item => (item.Manager?.trim() || 'Unknown') === selectedManager)
+  ), [data, selectedManager]);
 
   const charts = [
-    { title: "Overall Score Distribution", component: <ScoreChart data={filteredData} /> },
-    { title: "Self Interested Candidates", component: <SelfInterestChart data={filteredData} /> },
-    { title: "Absentee Analysis by Manager", component: <AbsenteeHeatmap data={filteredData} /> },
-    { title: "Attendance by Manager", component: <AttendanceChart data={filteredData} /> },
-    { title: "Integrity Scores", component: <IntegrityTable data={filteredData} /> },
+    { title: 'Overall Score Distribution', component: <ScoreChart data={filteredData} /> },
+    { title: 'Self Interested Candidates', component: <SelfInterestChart data={filteredData} /> },
+    { title: 'Absentee Analysis', component: <AbsenteeHeatmap data={filteredData} /> },
+    { title: 'Attendance by Manager', component: <AttendanceChart data={filteredData} /> },
+    { title: 'Integrity Scores', component: <IntegrityTable data={filteredData} /> },
   ];
 
   const handleDownloadPDF = async () => {
+    const chartIndex = currentChart;
+    const chartComponent = chartRefs.current[chartIndex];
+    if (!chartComponent) return;
+
     try {
-      const chartWrapper = chartRefs.current[currentChart];
-      if (!chartWrapper) return console.error("Chart wrapper not found.");
+      const cleanupViewport = PDFExportManager.handleMobileViewport();
+      const exportContainer = chartComponent.querySelector('[data-export-container]');
 
-      // Special handling for IntegrityTable (index 4)
-      if (currentChart === 4) {
-        const container = chartWrapper.querySelector('[data-export-container]');
-        if (!container) return;
+      const canvas = await trackPromise(
+        PDFExportManager.captureFullContent(exportContainer || chartComponent)
+      );
 
-        const originalStyles = {
-          overflow: container.style.overflow,
-          height: container.style.height,
-          position: container.style.position
-        };
+      const pdf = await PDFExportManager.generatePDF(
+        canvas,
+        charts[chartIndex].title,
+        chartIndex !== 4
+      );
 
-        // Force show all content
-        container.style.overflow = 'visible';
-        container.style.height = 'auto';
-        container.style.position = 'relative';
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const canvas = await html2canvas(container, {
-          scrollY: -window.scrollY,
-          useCORS: true,
-          scale: 2,
-          logging: false,
-          allowTaint: true,
-          width: container.scrollWidth,
-          height: container.scrollHeight,
-          windowWidth: container.scrollWidth,
-          windowHeight: container.scrollHeight
-        });
-
-        const pdf = new jsPDF('l', 'mm', [
-          canvas.width * 0.264583, 
-          canvas.height * 0.264583
-        ]);
-
-        pdf.addImage(canvas, 'PNG', 0, 0, 
-          pdf.internal.pageSize.getWidth(), 
-          pdf.internal.pageSize.getHeight()
-        );
-
-        // Restore original styles
-        container.style.overflow = originalStyles.overflow;
-        container.style.height = originalStyles.height;
-        container.style.position = originalStyles.position;
-
-        pdf.save('Integrity-Table.pdf');
-        return;
-      }
-
-      // Default handling for other charts
-      const scrollContainer = chartWrapper.querySelector('[data-export-container]') || chartWrapper;
-      
-      const originalOverflow = scrollContainer.style.overflow;
-      const originalHeight = scrollContainer.style.height;
-      
-      scrollContainer.style.overflow = 'visible';
-      scrollContainer.style.height = 'auto';
-
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      const canvas = await html2canvas(scrollContainer, {
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-        useCORS: true,
-        scale: 2,
-        logging: false,
-        allowTaint: true
-      });
-
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF({
-        orientation: currentChart === 0 ? 'portrait' : 'landscape',
-        unit: 'mm'
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.setFontSize(16);
-      pdf.setTextColor(40);
-      pdf.text(charts[currentChart].title, pdfWidth / 2, 15, { align: "center" });
-
-      pdf.addImage(imgData, 'PNG', 0, 20, pdfWidth, pdfHeight - 20);
-
-      const dateStr = new Date().toLocaleDateString();
-      pdf.setFontSize(10);
-      pdf.setTextColor(150);
-      pdf.text(`Exported on ${dateStr}`, pdfWidth - 15, pdf.internal.pageSize.getHeight() - 10, {
-        align: "right"
-      });
-
-      const filename = charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, "-");
-      pdf.save(`${filename}.pdf`);
-
-      scrollContainer.style.overflow = originalOverflow;
-      scrollContainer.style.height = originalHeight;
-    } catch (err) {
-      console.error("PDF export failed:", err);
+      pdf.save(`${charts[chartIndex].title.replace(/[^\w]/g, '_')}.pdf`);
+      cleanupViewport();
+    } catch (error) {
+      console.error('PDF Export Error:', error);
     }
   };
 
   const navigateChart = (direction) => {
-    const newIndex =
-      direction === "next"
-        ? (currentChart + 1) % charts.length
-        : (currentChart - 1 + charts.length) % charts.length;
+    const newIndex = direction === 'next' 
+      ? (currentChart + 1) % charts.length
+      : (currentChart - 1 + charts.length) % charts.length;
     setCurrentChart(newIndex);
-    if (chartWrapperRef.current) {
-      chartWrapperRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
-    }
   };
 
   return (
-    <Box sx={{ p: 3, height: "100vh", overflow: "hidden" }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          justifyContent: "space-between",
-          alignItems: isMobile ? "flex-start" : "center",
-          mb: 3,
-          gap: 2,
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            width: isMobile ? "100%" : "auto",
-            minWidth: isTablet ? "200px" : "300px",
-          }}
-        >
-          <Avatar sx={{ bgcolor: "primary.main", width: 48, height: 48, mr: 2 }}>
+    <Box sx={{ p: 3, height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      <AnimatePresence>
+        {promiseInProgress && (
+          <Box sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.9)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            color: '#fff'
+          }}>
+            <Typography variant="h6" gutterBottom>Generating PDF...</Typography>
+            <LinearProgress sx={{ width: 300, height: 8, borderRadius: 4 }} />
+          </Box>
+        )}
+      </AnimatePresence>
+
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 3,
+        gap: 2,
+        flexWrap: 'wrap'
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Avatar sx={{ bgcolor: 'primary.main' }}>
             <FiPieChart />
           </Avatar>
-          <Typography
-            variant={isMobile ? "h6" : "h5"}
-            sx={{
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
+          <Typography variant="h5" fontWeight="bold">
             {charts[currentChart].title}
           </Typography>
         </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            gap: 2,
-            width: isMobile ? "100%" : "auto",
-          }}
-        >
-          <Button
-            variant="outlined"
-            onClick={onToggleView}
-            sx={{
-              height: 36,
-              minWidth: isMobile ? "50%" : 120,
-              textTransform: "none",
-              fontWeight: "bold",
-              color: "#1976d2",
-              borderColor: "#1976d2",
-              backgroundColor: "#ffffff",
-              '&:hover': {
-                backgroundColor: "#1976d2",
-                color: "#ffffff",
-                boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
-              },
-            }}
-          >
-            Back to Table
-          </Button>
-          <FormControl size="small" sx={{ minWidth: isMobile ? "100%" : 180 }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <FormControl size="small" sx={{ minWidth: 180 }}>
             <Select
               value={selectedManager}
               onChange={(e) => setSelectedManager(e.target.value)}
               sx={{
-                height: 36,
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                '& .MuiSelect-select': { py: 1 }
               }}
             >
-              {managers.map((manager) => (
-                <MenuItem key={manager} value={manager}>
-                  {manager}
-                </MenuItem>
+              {managers.map(manager => (
+                <MenuItem key={manager} value={manager}>{manager}</MenuItem>
               ))}
             </Select>
           </FormControl>
+          
           <Button
             variant="contained"
             startIcon={<FiDownload />}
             onClick={handleDownloadPDF}
-            sx={{ height: 36, minWidth: isMobile ? "50%" : 120, textTransform: "none" }}
+            sx={{ textTransform: 'none' }}
           >
             Export PDF
+          </Button>
+          
+          <Button
+            variant="outlined"
+            onClick={onToggleView}
+            sx={{ textTransform: 'none' }}
+          >
+            Back to Table
           </Button>
         </Box>
       </Box>
 
-      <Box sx={{ position: "relative" }}>
-        <ChartContainer>
-          <ChartWrapper ref={chartWrapperRef}>
-            {charts.map((chart, index) => (
-              <Box
-                key={index}
-                ref={(el) => (chartRefs.current[index] = el)}
-                sx={{ minWidth: "100%", height: "100%", p: 2 }}
-              >
-                {chart.component}
-              </Box>
-            ))}
-          </ChartWrapper>
-        </ChartContainer>
+      <Paper elevation={3} sx={{
+        width: '100%',
+        height: 'calc(100vh - 180px)',
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: theme.shadows[4],
+        backgroundColor: theme.palette.background.paper,
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <Box sx={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {charts.map((chart, index) => (
+            <Box
+              key={index}
+              ref={el => chartRefs.current[index] = el}
+              sx={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                left: `${(index - currentChart) * 100}%`,
+                transition: 'left 0.3s ease',
+                p: 2
+              }}
+            >
+              {chart.component}
+            </Box>
+          ))}
+        </Box>
+
+        <Box sx={{
+          position: 'absolute',
+          bottom: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: 1
+        }}>
+          {charts.map((_, index) => (
+            <Box
+              key={index}
+              sx={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                bgcolor: currentChart === index ? 'primary.main' : 'action.disabled',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => setCurrentChart(index)}
+            />
+          ))}
+        </Box>
 
         <IconButton
-          onClick={() => navigateChart("prev")}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: 10,
-            transform: "translateY(-50%)",
-          }}
+          onClick={() => navigateChart('prev')}
+          sx={{ position: 'absolute', left: 16, top: '50%' }}
         >
           <FiChevronLeft />
         </IconButton>
         <IconButton
-          onClick={() => navigateChart("next")}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            right: 10,
-            transform: "translateY(-50%)",
-          }}
+          onClick={() => navigateChart('next')}
+          sx={{ position: 'absolute', right: 16, top: '50%' }}
         >
           <FiChevronRight />
         </IconButton>
-      </Box>
+      </Paper>
     </Box>
   );
 };
