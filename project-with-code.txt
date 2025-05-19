@@ -506,333 +506,278 @@ export const getColorForValue = (value, maxValue) => {
 
 
 ### D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
-import { useState, useRef, useMemo } from "react";
+// D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
+import React, { useState, useRef, useMemo } from 'react';
 import {
-  Box,
-  Typography,
-  Paper,
-  Avatar,
-  Button,
-  useTheme,
-  IconButton,
-  styled,
-  FormControl,
-  Select,
-  MenuItem,
-  useMediaQuery,
-} from "@mui/material";
-import {
-  FiDownload,
-  FiPieChart,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import ScoreChart from "./ScoreChart";
-import SelfInterestChart from "./SelfInterestChart";
-import AbsenteeHeatmap from "./AbsenteeHeatmap";
-import AttendanceChart from "./AttendanceChart";
-import IntegrityTable from "./IntegrityTable";
-
-const ChartContainer = styled(Paper)(({ theme }) => ({
-  width: "100%",
-  height: "calc(100vh - 180px)",
-  overflow: "hidden",
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[2],
-  backgroundColor: theme.palette.background.paper,
-}));
-
-const ChartWrapper = styled(Box)({
-  width: "100%",
-  height: "100%",
-  display: "flex",
-  transition: "transform 0.3s ease",
-});
+  Box, Typography, Paper, Avatar, Button, useTheme, IconButton,
+  FormControl, Select, MenuItem, useMediaQuery, LinearProgress,
+  Stack, ButtonGroup
+} from '@mui/material';
+import { FiDownload, FiPieChart, FiChevronLeft, FiChevronRight, FiArrowLeft } from 'react-icons/fi';
+import { usePromiseTracker, trackPromise } from 'react-promise-tracker';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PDFExportManager } from '../../utils/pdfExport';
+import ScoreChart from './ScoreChart';
+import SelfInterestChart from './SelfInterestChart';
+import AbsenteeHeatmap from './AbsenteeHeatmap';
+import AttendanceChart from './AttendanceChart';
+import IntegrityTable from './IntegrityTable';
 
 const ChartView = ({ data, onToggleView }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery("(max-width:600px)");
-  const isTablet = useMediaQuery("(max-width:900px)");
+  const { promiseInProgress } = usePromiseTracker();
   const [currentChart, setCurrentChart] = useState(0);
-  const [selectedManager, setSelectedManager] = useState("All Managers");
-  const chartWrapperRef = useRef(null);
+  const [selectedManager, setSelectedManager] = useState('All Managers');
   const chartRefs = useRef([]);
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const isTablet = useMediaQuery('(max-width:900px)');
 
-  const managers = useMemo(() => {
-    const managerSet = new Set();
-    data.forEach((item) => {
-      const manager = item.Manager?.trim() || "Unknown";
-      managerSet.add(manager);
-    });
-    return ["All Managers", ...Array.from(managerSet).sort()];
-  }, [data]);
+  const managers = useMemo(() => [
+    'All Managers',
+    ...new Set(data.map(item => item.Manager?.trim() || 'Unknown'))
+  ], [data]);
 
-  const filteredData = useMemo(() => {
-    if (selectedManager === "All Managers") return data;
-    return data.filter((item) => {
-      const manager = item.Manager?.trim() || "Unknown";
-      return manager === selectedManager;
-    });
-  }, [data, selectedManager]);
+  const filteredData = useMemo(() => (
+    selectedManager === 'All Managers'
+      ? data
+      : data.filter(item => (item.Manager?.trim() || 'Unknown') === selectedManager)
+  ), [data, selectedManager]);
 
   const charts = [
-    { title: "Overall Score Distribution", component: <ScoreChart data={filteredData} /> },
-    { title: "Self Interested Candidates", component: <SelfInterestChart data={filteredData} /> },
-    { title: "Absentee Analysis by Manager", component: <AbsenteeHeatmap data={filteredData} /> },
-    { title: "Attendance by Manager", component: <AttendanceChart data={filteredData} /> },
-    { title: "Integrity Scores", component: <IntegrityTable data={filteredData} /> },
+    { title: 'Overall Score Distribution', component: <ScoreChart data={filteredData} /> },
+    { title: 'Self Interested Candidates', component: <SelfInterestChart data={filteredData} /> },
+    { title: 'Absentee Analysis', component: <AbsenteeHeatmap data={filteredData} /> },
+    { title: 'Attendance by Manager', component: <AttendanceChart data={filteredData} /> },
+    { title: 'Integrity Scores', component: <IntegrityTable data={filteredData} /> },
   ];
 
   const handleDownloadPDF = async () => {
+    const chartIndex = currentChart;
+    const chartComponent = chartRefs.current[chartIndex];
+    if (!chartComponent) return;
+
     try {
-      const chartWrapper = chartRefs.current[currentChart];
-      if (!chartWrapper) return console.error("Chart wrapper not found.");
+      const cleanupViewport = PDFExportManager.handleMobileViewport();
+      const exportContainer = chartComponent.querySelector('[data-export-container]');
 
-      // Special handling for IntegrityTable (index 4)
-      if (currentChart === 4) {
-        const container = chartWrapper.querySelector('[data-export-container]');
-        if (!container) return;
+      const { canvas, title } = await trackPromise(
+        PDFExportManager.captureFullContent(
+          exportContainer || chartComponent,
+          charts[chartIndex].title
+        )
+      );
 
-        const originalStyles = {
-          overflow: container.style.overflow,
-          height: container.style.height,
-          position: container.style.position
-        };
+      const pdf = await PDFExportManager.generatePDF(
+        { canvas, title },
+        chartIndex !== 4 // Portrait for IntegrityTable
+      );
 
-        // Force show all content
-        container.style.overflow = 'visible';
-        container.style.height = 'auto';
-        container.style.position = 'relative';
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const canvas = await html2canvas(container, {
-          scrollY: -window.scrollY,
-          useCORS: true,
-          scale: 2,
-          logging: false,
-          allowTaint: true,
-          width: container.scrollWidth,
-          height: container.scrollHeight,
-          windowWidth: container.scrollWidth,
-          windowHeight: container.scrollHeight
-        });
-
-        const pdf = new jsPDF('l', 'mm', [
-          canvas.width * 0.264583, 
-          canvas.height * 0.264583
-        ]);
-
-        pdf.addImage(canvas, 'PNG', 0, 0, 
-          pdf.internal.pageSize.getWidth(), 
-          pdf.internal.pageSize.getHeight()
-        );
-
-        // Restore original styles
-        container.style.overflow = originalStyles.overflow;
-        container.style.height = originalStyles.height;
-        container.style.position = originalStyles.position;
-
-        pdf.save('Integrity-Table.pdf');
-        return;
-      }
-
-      // Default handling for other charts
-      const scrollContainer = chartWrapper.querySelector('[data-export-container]') || chartWrapper;
-      
-      const originalOverflow = scrollContainer.style.overflow;
-      const originalHeight = scrollContainer.style.height;
-      
-      scrollContainer.style.overflow = 'visible';
-      scrollContainer.style.height = 'auto';
-
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      const canvas = await html2canvas(scrollContainer, {
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-        useCORS: true,
-        scale: 2,
-        logging: false,
-        allowTaint: true
-      });
-
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF({
-        orientation: currentChart === 0 ? 'portrait' : 'landscape',
-        unit: 'mm'
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.setFontSize(16);
-      pdf.setTextColor(40);
-      pdf.text(charts[currentChart].title, pdfWidth / 2, 15, { align: "center" });
-
-      pdf.addImage(imgData, 'PNG', 0, 20, pdfWidth, pdfHeight - 20);
-
-      const dateStr = new Date().toLocaleDateString();
-      pdf.setFontSize(10);
-      pdf.setTextColor(150);
-      pdf.text(`Exported on ${dateStr}`, pdfWidth - 15, pdf.internal.pageSize.getHeight() - 10, {
-        align: "right"
-      });
-
-      const filename = charts[currentChart].title.replace(/[/\\?%*:|"<>]/g, "-");
-      pdf.save(`${filename}.pdf`);
-
-      scrollContainer.style.overflow = originalOverflow;
-      scrollContainer.style.height = originalHeight;
-    } catch (err) {
-      console.error("PDF export failed:", err);
+      pdf.save(`${title.replace(/[^\w]/g, '_')}.pdf`);
+      cleanupViewport();
+    } catch (error) {
+      console.error('PDF Export Error:', error);
     }
   };
 
   const navigateChart = (direction) => {
-    const newIndex =
-      direction === "next"
-        ? (currentChart + 1) % charts.length
-        : (currentChart - 1 + charts.length) % charts.length;
+    const newIndex = direction === 'next' 
+      ? (currentChart + 1) % charts.length
+      : (currentChart - 1 + charts.length) % charts.length;
     setCurrentChart(newIndex);
-    if (chartWrapperRef.current) {
-      chartWrapperRef.current.style.transform = `translateX(-${newIndex * 100}%)`;
-    }
   };
 
   return (
-    <Box sx={{ p: 3, height: "100vh", overflow: "hidden" }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          justifyContent: "space-between",
-          alignItems: isMobile ? "flex-start" : "center",
-          mb: 3,
+    <Box sx={{ p: isMobile ? 1 : 3, height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      <AnimatePresence>
+        {promiseInProgress && (
+          <Box sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.9)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            color: '#fff'
+          }}>
+            <Typography variant="h6" gutterBottom>Generating PDF...</Typography>
+            <LinearProgress sx={{ width: 300, height: 8, borderRadius: 4 }} />
+          </Box>
+        )}
+      </AnimatePresence>
+
+      {/* Responsive Header Section */}
+      <Box sx={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'space-between',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        mb: 2,
+        gap: 2
+      }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
           gap: 2,
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            width: isMobile ? "100%" : "auto",
-            minWidth: isTablet ? "200px" : "300px",
-          }}
-        >
-          <Avatar sx={{ bgcolor: "primary.main", width: 48, height: 48, mr: 2 }}>
-            <FiPieChart />
+          width: isMobile ? '100%' : 'auto'
+        }}>
+          <Avatar sx={{ 
+            bgcolor: 'primary.main',
+            width: isMobile ? 36 : 48,
+            height: isMobile ? 36 : 48
+          }}>
+            <FiPieChart size={isMobile ? 18 : 24} />
           </Avatar>
-          <Typography
-            variant={isMobile ? "h6" : "h5"}
-            sx={{
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
+          <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight="bold" noWrap>
             {charts[currentChart].title}
           </Typography>
         </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            gap: 2,
-            width: isMobile ? "100%" : "auto",
+        <Stack 
+          direction={isMobile ? 'column' : 'row'} 
+          spacing={1}
+          sx={{ 
+            width: isMobile ? '100%' : 'auto',
+            '& .MuiFormControl-root': { width: isMobile ? '100%' : 180 }
           }}
         >
-          <Button
-            variant="outlined"
-            onClick={onToggleView}
-            sx={{
-              height: 36,
-              minWidth: isMobile ? "50%" : 120,
-              textTransform: "none",
-              fontWeight: "bold",
-              color: "#1976d2",
-              borderColor: "#1976d2",
-              backgroundColor: "#ffffff",
-              '&:hover': {
-                backgroundColor: "#1976d2",
-                color: "#ffffff",
-                boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
-              },
-            }}
-          >
-            Back to Table
-          </Button>
-          <FormControl size="small" sx={{ minWidth: isMobile ? "100%" : 180 }}>
+          <FormControl size="small">
             <Select
               value={selectedManager}
               onChange={(e) => setSelectedManager(e.target.value)}
               sx={{
-                height: 36,
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                '& .MuiSelect-select': { py: 1 }
               }}
             >
-              {managers.map((manager) => (
+              {managers.map(manager => (
                 <MenuItem key={manager} value={manager}>
-                  {manager}
+                  {isMobile ? manager.substring(0, 15) + (manager.length > 15 ? '...' : '') : manager}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Button
-            variant="contained"
-            startIcon={<FiDownload />}
-            onClick={handleDownloadPDF}
-            sx={{ height: 36, minWidth: isMobile ? "50%" : 120, textTransform: "none" }}
-          >
-            Export PDF
-          </Button>
-        </Box>
+          
+          <ButtonGroup fullWidth={isMobile} sx={{ gap: 1 }}>
+            <Button
+              variant="contained"
+              startIcon={<FiDownload size={18} />}
+              onClick={handleDownloadPDF}
+              sx={{ 
+                textTransform: 'none',
+                flex: isMobile ? 1 : 'none'
+              }}
+            >
+              {isMobile ? 'PDF' : 'Export PDF'}
+            </Button>
+            
+            <Button
+              variant="outlined"
+              startIcon={<FiArrowLeft size={18} />}
+              onClick={onToggleView}
+              sx={{ 
+                textTransform: 'none',
+                flex: isMobile ? 1 : 'none'
+              }}
+            >
+              {isMobile ? 'Table' : 'Back to Table'}
+            </Button>
+          </ButtonGroup>
+        </Stack>
       </Box>
 
-      <Box sx={{ position: "relative" }}>
-        <ChartContainer>
-          <ChartWrapper ref={chartWrapperRef}>
-            {charts.map((chart, index) => (
-              <Box
-                key={index}
-                ref={(el) => (chartRefs.current[index] = el)}
-                sx={{ minWidth: "100%", height: "100%", p: 2 }}
-              >
-                {chart.component}
-              </Box>
-            ))}
-          </ChartWrapper>
-        </ChartContainer>
+      {/* Charts Container */}
+      <Paper elevation={3} sx={{
+        width: '100%',
+        height: isMobile ? 'calc(100vh - 160px)' : 'calc(100vh - 180px)',
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: theme.shadows[4],
+        backgroundColor: theme.palette.background.paper,
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <Box sx={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {charts.map((chart, index) => (
+            <Box
+              key={index}
+              ref={el => chartRefs.current[index] = el}
+              sx={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                left: `${(index - currentChart) * 100}%`,
+                transition: 'left 0.3s ease',
+                p: isMobile ? 1 : 2
+              }}
+            >
+              {chart.component}
+            </Box>
+          ))}
+        </Box>
 
+        {/* Navigation Dots */}
+        <Box sx={{
+          position: 'absolute',
+          bottom: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: 1
+        }}>
+          {charts.map((_, index) => (
+            <Box
+              key={index}
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                bgcolor: currentChart === index ? 'primary.main' : 'action.disabled',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => setCurrentChart(index)}
+            />
+          ))}
+        </Box>
+
+        {/* Navigation Arrows */}
         <IconButton
-          onClick={() => navigateChart("prev")}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: 10,
-            transform: "translateY(-50%)",
+          onClick={() => navigateChart('prev')}
+          sx={{ 
+            position: 'absolute', 
+            left: 8, 
+            top: '50%',
+            bgcolor: 'background.paper',
+            boxShadow: 1,
+            '&:hover': { bgcolor: 'action.hover' }
           }}
         >
           <FiChevronLeft />
         </IconButton>
         <IconButton
-          onClick={() => navigateChart("next")}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            right: 10,
-            transform: "translateY(-50%)",
+          onClick={() => navigateChart('next')}
+          sx={{ 
+            position: 'absolute', 
+            right: 8, 
+            top: '50%',
+            bgcolor: 'background.paper',
+            boxShadow: 1,
+            '&:hover': { bgcolor: 'action.hover' }
           }}
         >
           <FiChevronRight />
         </IconButton>
-      </Box>
+      </Paper>
     </Box>
   );
 };
@@ -841,7 +786,9 @@ export default ChartView;
 
 
 ### D:\ICANIO intern\React\dashboard-project\src\components\Charts\IntegrityTable.jsx
-import { 
+// D:\ICANIO intern\React\dashboard-project\src\components\Charts\IntegrityTable.jsx
+import React, { forwardRef, useRef, useState, useEffect } from 'react';
+import {
   Box,
   Table,
   TableBody,
@@ -857,7 +804,6 @@ import {
   Avatar
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { useState, forwardRef, useRef, useEffect } from 'react';
 import { getInitials } from './chartUtils';
 
 const IntegrityTable = forwardRef(({ data }, ref) => {
@@ -868,7 +814,7 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
   const tableRef = useRef(null);
 
   useEffect(() => {
-    if (containerRef.current && tableRef.current) {
+    if (containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
   }, [data]);
@@ -880,316 +826,164 @@ const IntegrityTable = forwardRef(({ data }, ref) => {
   };
 
   const sortedData = [...data].sort((a, b) => {
-    const aValue = a[orderBy] || 0;
-    const bValue = b[orderBy] || 0;
-    return order === 'asc' ? aValue - bValue : bValue - aValue;
+    const aVal = a[orderBy] || 0;
+    const bVal = b[orderBy] || 0;
+    return order === 'asc' ? aVal - bVal : bVal - aVal;
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.3 }}
+    <Box
+      ref={ref}
+      data-export-container
+      sx={{
+        width: '100%',
+        height: 'calc(100vh - 180px)',
+        overflow: 'hidden',
+        position: 'relative'
+      }}
     >
-      <Paper
-        ref={ref}
-        data-export-container
-        elevation={3}
-        sx={{
-          p: 4,
-          borderRadius: '18px',
-          background: theme.palette.mode === 'dark' 
-            ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' 
-            : 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          boxShadow: theme.shadows[10],
-          border: theme.palette.mode === 'dark' 
-            ? '1px solid rgba(255,255,255,0.1)' 
-            : '1px solid rgba(0,0,0,0.1)',
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: 'calc(100vh - 180px)',
-          overflow: 'hidden'
-        }}
-      >
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            mb: 3, 
-            fontWeight: 700, 
-            color: theme.palette.text.primary,
-            fontSize: '1.5rem',
-            background: theme.palette.mode === 'dark' 
-              ? 'linear-gradient(90deg, #4a6fa5, #166d67)' 
-              : 'linear-gradient(90deg, #1976d2, #0288d1)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}
-        >
-          Integrity Scores Overview
-        </Typography>
+      <Typography variant="h6" sx={{
+        mb: 2,
+        fontWeight: 700,
+        background: theme.palette.mode === 'dark'
+          ? 'linear-gradient(90deg, #4a6fa5, #166d67)'
+          : 'linear-gradient(90deg, #1976d2, #0288d1)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        p: 2
+      }}>
+        Integrity Scores Overview
+      </Typography>
 
-        <Box
-          ref={containerRef}
-          sx={{
-            flex: 1,
-            width: '100%',
-            overflow: 'auto',
-            '&::-webkit-scrollbar': {
-              width: 10,
-              height: 10,
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: theme.palette.primary.main,
-              borderRadius: 4,
-              border: `1px solid ${theme.palette.primary.contrastText}`
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.05)',
-              borderRadius: 4
-            },
-            '&::-webkit-scrollbar-corner': {
-              background: 'transparent'
-            }
-          }}
-        >
-          <Table 
-            ref={tableRef}
-            stickyHeader 
-            size="small" 
-            aria-label="integrity table"
-            sx={{
-              minWidth: 'max-content',
-              width: '100%',
-              tableLayout: 'fixed',
-              background: theme.palette.background.paper
-            }}
-          >
-            <TableHead>
-              <TableRow>
+      <TableContainer ref={containerRef} sx={{
+        height: 'calc(100% - 80px)',
+        '&::-webkit-scrollbar': { width: 10, height: 10 },
+        '&::-webkit-scrollbar-thumb': {
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, #4a6fa5, #166d67)'
+            : 'linear-gradient(135deg, #1976d2, #0288d1)',
+          borderRadius: 4
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: theme.palette.mode === 'dark'
+            ? 'rgba(255,255,255,0.05)'
+            : 'rgba(0,0,0,0.05)'
+        }
+      }}>
+        <Table ref={tableRef} stickyHeader size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                sx={{
+                  position: 'sticky',
+                  top: 0,
+                  backgroundColor: theme.palette.mode === 'dark'
+                    ? 'rgba(26, 32, 53, 0.9)'
+                    : 'rgba(245, 247, 250, 0.9)',
+                  minWidth: 300,
+                  width: 300
+                }}
+              >
+                Candidate
+              </TableCell>
+              {['Integrity Score (out of 10)', 'Time Spent Offtab (in secs)'].map((column) => (
                 <TableCell
+                  key={column}
+                  align="right"
                   sx={{
                     position: 'sticky',
                     top: 0,
-                    backgroundColor: theme.palette.mode === 'dark' 
-                      ? 'rgba(26, 32, 53, 0.9)' 
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(26, 32, 53, 0.9)'
                       : 'rgba(245, 247, 250, 0.9)',
-                    color: theme.palette.text.primary,
-                    fontWeight: 'bold',
-                    fontSize: '15px',
-                    fontFamily: "'Montserrat', sans-serif",
-                    borderBottom: 'none',
-                    zIndex: 2,
-                    minWidth: 300,
-                    width: 300
+                    minWidth: 200,
+                    width: 200
                   }}
                 >
-                  Candidate
+                  <TableSortLabel
+                    active={orderBy === column}
+                    direction={orderBy === column ? order : 'asc'}
+                    onClick={() => handleSort(column)}
+                  >
+                    {column === 'Time Spent Offtab (in secs)' ? 'Off-task Time' : 'Integrity Score'}
+                  </TableSortLabel>
                 </TableCell>
-                {['Integrity Score (out of 10)', 'Time Spent Offtab (in secs)'].map((column) => (
-                  <TableCell
-                    key={column}
-                    align="right"
-                    sx={{
-                      position: 'sticky',
-                      top: 0,
-                      backgroundColor: theme.palette.mode === 'dark' 
-                        ? 'rgba(26, 32, 53, 0.9)' 
-                        : 'rgba(245, 247, 250, 0.9)',
-                      color: theme.palette.text.primary,
-                      fontWeight: 'bold',
-                      fontSize: '15px',
-                      fontFamily: "'Montserrat', sans-serif",
-                      borderBottom: 'none',
-                      zIndex: 2,
-                      minWidth: 200,
-                      width: 200
-                    }}
-                  >
-                    <TableSortLabel
-                      active={orderBy === column}
-                      direction={orderBy === column ? order : 'asc'}
-                      onClick={() => handleSort(column)}
-                      sx={{
-                        color: theme.palette.text.primary + '!important',
-                        '& .MuiTableSortLabel-icon': {
-                          color: theme.palette.text.primary + '!important'
-                        }
-                      }}
-                    >
-                      {column === 'Time Spent Offtab (in secs)' ? (
-                        <Tooltip title="Time spent away from assessment">
-                          <span>Off-task Time</span>
-                        </Tooltip>
-                      ) : (
-                        'Integrity Score'
-                      )}
-                    </TableSortLabel>
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedData.map((row, index) => (
-                <motion.tr
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <TableCell 
-                    sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center',
-                      borderBottom: theme.palette.mode === 'dark' 
-                        ? '1px solid rgba(255,255,255,0.05)' 
-                        : '1px solid rgba(0,0,0,0.05)',
-                      backgroundColor: index % 2 === 0
-                        ? theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'
-                        : 'transparent',
-                      minWidth: 300,
-                      width: 300
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        mr: 2,
-                        bgcolor: `hsl(${180 + (index * 137.5) % 60}, 70%, ${
-                          theme.palette.mode === 'dark' ? '40%' : '70%'
-                        })`,
-                        color: theme.palette.getContrastText(
-                          `hsl(${180 + (index * 137.5) % 60}, 70%, ${
-                            theme.palette.mode === 'dark' ? '40%' : '70%'
-                          })`
-                        ),
-                        fontSize: '0.8rem',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {getInitials(row.Name)}
-                    </Avatar>
-                    <Typography variant="body2" fontWeight={600}>
-                      {row.Name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell 
-                    align="right"
-                    sx={{
-                      borderBottom: theme.palette.mode === 'dark' 
-                        ? '1px solid rgba(255,255,255,0.05)' 
-                        : '1px solid rgba(0,0,0,0.05)',
-                      backgroundColor: index % 2 === 0
-                        ? theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'
-                        : 'transparent',
-                      minWidth: 200,
-                      width: 200
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        px: 2,
-                        py: 1,
-                        borderRadius: '16px',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        fontFamily: "'Montserrat', sans-serif",
-                        boxShadow: theme.shadows[1],
-                        backgroundColor:
-                          row['Integrity Score (out of 10)'] >= 8
-                            ? theme.palette.mode === 'dark' 
-                              ? 'rgba(46, 125, 50, 0.3)' 
-                              : 'rgba(46, 125, 50, 0.15)'
-                            : row['Integrity Score (out of 10)'] >= 5
-                              ? theme.palette.mode === 'dark' 
-                                ? 'rgba(237, 108, 2, 0.3)' 
-                                : 'rgba(237, 108, 2, 0.15)'
-                              : theme.palette.mode === 'dark' 
-                                ? 'rgba(211, 47, 47, 0.3)' 
-                                : 'rgba(211, 47, 47, 0.15)',
-                        color:
-                          row['Integrity Score (out of 10)'] >= 8
-                            ? theme.palette.success.light
-                            : row['Integrity Score (out of 10)'] >= 5
-                              ? theme.palette.warning.light
-                              : theme.palette.error.light,
-                      }}
-                    >
-                      {row['Integrity Score (out of 10)']}/10
-                    </Box>
-                  </TableCell>
-                  <TableCell 
-                    align="right"
-                    sx={{
-                      borderBottom: theme.palette.mode === 'dark' 
-                        ? '1px solid rgba(255,255,255,0.05)' 
-                        : '1px solid rgba(0,0,0,0.05)',
-                      backgroundColor: index % 2 === 0
-                        ? theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'
-                        : 'transparent',
-                      minWidth: 200,
-                      width: 200
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        px: 2,
-                        py: 1,
-                        borderRadius: '16px',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        fontFamily: "'Montserrat', sans-serif",
-                        boxShadow: theme.shadows[1],
-                        backgroundColor: row['Time Spent Offtab (in secs)'] > 0
-                          ? theme.palette.mode === 'dark' 
-                            ? 'rgba(211, 47, 47, 0.3)' 
-                            : 'rgba(211, 47, 47, 0.15)'
-                          : theme.palette.mode === 'dark' 
-                            ? 'rgba(46, 125, 50, 0.3)' 
-                            : 'rgba(46, 125, 50, 0.15)',
-                        color: row['Time Spent Offtab (in secs)'] > 0
-                          ? theme.palette.error.light
-                          : theme.palette.success.light,
-                      }}
-                    >
-                      {row['Time Spent Offtab (in secs)'] > 0
-                        ? `${Math.floor(row['Time Spent Offtab (in secs)']/60)}m ${row['Time Spent Offtab (in secs)']%60}s`
-                        : 'None'}
-                    </Box>
-                  </TableCell>
-                </motion.tr>
               ))}
-            </TableBody>
-          </Table>
-        </Box>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Typography 
-            variant="caption" 
-            sx={{ 
-              mt: 2, 
-              textAlign: 'right', 
-              color: theme.palette.text.secondary,
-              fontFamily: "'Montserrat', sans-serif",
-              fontWeight: 600
-            }}
-          >
-            Showing {sortedData.length} records
-          </Typography>
-        </motion.div>
-      </Paper>
-    </motion.div>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sortedData.map((row, index) => (
+              <TableRow key={index}>
+                <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      mr: 2,
+                      bgcolor: `hsl(${180 + (index * 137.5) % 60}, 70%, ${
+                        theme.palette.mode === 'dark' ? '40%' : '70%'
+                      })`
+                    }}
+                  >
+                    {getInitials(row.Name)}
+                  </Avatar>
+                  <Typography variant="body2" fontWeight={600}>
+                    {row.Name}
+                  </Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      px: 2,
+                      py: 1,
+                      borderRadius: '16px',
+                      fontWeight: 600,
+                      backgroundColor:
+                        row['Integrity Score (out of 10)'] >= 8
+                          ? theme.palette.mode === 'dark'
+                            ? 'rgba(46, 125, 50, 0.3)'
+                            : 'rgba(46, 125, 50, 0.15)'
+                          : row['Integrity Score (out of 10)'] >= 5
+                            ? theme.palette.mode === 'dark'
+                              ? 'rgba(237, 108, 2, 0.3)'
+                              : 'rgba(237, 108, 2, 0.15)'
+                            : theme.palette.mode === 'dark'
+                              ? 'rgba(211, 47, 47, 0.3)'
+                              : 'rgba(211, 47, 47, 0.15)'
+                    }}
+                  >
+                    {row['Integrity Score (out of 10)']}/10
+                  </Box>
+                </TableCell>
+                <TableCell align="right">
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      px: 2,
+                      py: 1,
+                      borderRadius: '16px',
+                      fontWeight: 600,
+                      backgroundColor: row['Time Spent Offtab (in secs)'] > 0
+                        ? theme.palette.mode === 'dark'
+                          ? 'rgba(211, 47, 47, 0.3)'
+                          : 'rgba(211, 47, 47, 0.15)'
+                        : theme.palette.mode === 'dark'
+                          ? 'rgba(46, 125, 50, 0.3)'
+                          : 'rgba(46, 125, 50, 0.15)'
+                    }}
+                  >
+                    {row['Time Spent Offtab (in secs)'] > 0
+                      ? `${Math.floor(row['Time Spent Offtab (in secs)']/60)}m ${row['Time Spent Offtab (in secs)']%60}s`
+                      : 'None'}
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 });
 
@@ -1197,8 +991,10 @@ export default IntegrityTable;
 
 
 ### D:\ICANIO intern\React\dashboard-project\src\components\Charts\ScoreChart.jsx
-import { Bar } from 'react-chartjs-2';
+// D:\ICANIO intern\React\dashboard-project\src\components\Charts\ScoreChart.jsx
+import React, { useRef, useEffect, useMemo } from 'react';
 import { Box, useTheme, useMediaQuery } from '@mui/material';
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -1208,31 +1004,49 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+// Enhanced percentage plugin with perfect end-of-bar positioning
+const percentagePlugin = {
+  id: 'barPercentage',
+  afterDatasetsDraw: (chart) => {
+    const { ctx, data, chartArea: { right }, scales: { x, y } } = chart;
+    
+    data.datasets.forEach((dataset, datasetIndex) => {
+      const meta = chart.getDatasetMeta(datasetIndex);
+      meta.data.forEach((bar, index) => {
+        const value = dataset.data[index];
+        // Position at bar end + 8px padding
+        const xPos = x.getPixelForValue(value) + (value === 100 ? 15 : 8);
+        const yPos = bar.y;
+        
+        ctx.save();
+        ctx.font = `bold ${chart.options.plugins.barPercentage.fontSize}px 'Montserrat'`;
+        ctx.fillStyle = chart.options.plugins.barPercentage.fontColor;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        // Only draw if within chart area (with 5px buffer)
+        if (xPos < right - 5) {
+          ctx.fillText(`${value}%`, xPos, yPos);
+        }
+        ctx.restore();
+      });
+    });
+  }
+};
+
 const ScoreChart = ({ data }) => {
   const theme = useTheme();
-  const containerRef = useRef(null);
   const chartRef = useRef(null);
-
+  const containerRef = useRef(null);
   const isMobile = useMediaQuery('(max-width:600px)');
   const isTablet = useMediaQuery('(max-width:900px)');
 
-  const sortedData = [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']);
-  const barHeight = isMobile ? 16 : isTablet ? 20 : 24;
-  const barSpacing = 5;
-  const chartHeight = sortedData.length * (barHeight + barSpacing) + 80;
-  const maxNameLength = Math.max(...sortedData.map(item => item.Name.length));
-  const nameAreaWidth = Math.min(isMobile ? 150 : isTablet ? 200 : 300, maxNameLength * 8);
-
-  useEffect(() => {
-    if (containerRef.current && chartRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, []);
+  const sortedData = useMemo(() => 
+    [...data].sort((a, b) => b['Overall Percentage'] - a['Overall Percentage']), 
+    [data]
+  );
 
   const generateBlueColors = (count) => {
     return Array.from({ length: count }, (_, i) =>
@@ -1243,15 +1057,15 @@ const ScoreChart = ({ data }) => {
   const chartData = {
     labels: sortedData.map(item => item.Name),
     datasets: [{
-      label: 'Score',
+      label: 'Score (%)',
       data: sortedData.map(item => item['Overall Percentage']),
       backgroundColor: generateBlueColors(sortedData.length),
       borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
       borderWidth: 1,
       borderRadius: 6,
-      barThickness: barHeight,
-      hoverBorderWidth: 2,
-      hoverBorderColor: theme.palette.primary.light,
+      barThickness: isMobile ? 20 : 26,
+      categoryPercentage: 0.85,
+      barPercentage: 0.9
     }]
   };
 
@@ -1259,157 +1073,100 @@ const ScoreChart = ({ data }) => {
     indexAxis: 'y',
     responsive: true,
     maintainAspectRatio: false,
-    animation: {
-      duration: 500,
-      easing: 'easeOutQuad',
-    },
     layout: {
       padding: {
-        left: nameAreaWidth + 10,
-        right: 50,
+        left: isMobile ? 25 : 45, // Increased left padding for names
+        right: isMobile ? 80 : 100, // More space for percentages
         top: 20,
-        bottom: 40
+        bottom: 20
       }
     },
     plugins: {
       legend: { display: false },
-      tooltip: { enabled: true },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.parsed.x}%`
+        }
+      },
+      barPercentage: {
+        fontSize: isMobile ? 12 : 14,
+        fontColor: theme.palette.text.primary
+      }
     },
     scales: {
       x: {
-        max: 100,
+        max: 105, // Extra space for 100% label
         min: 0,
         ticks: {
           callback: (value) => `${value}%`,
-          font: {
-            size: isMobile ? 10 : 13,
-            weight: 'bold',
+          font: { 
+            size: isMobile ? 11 : 13,
             family: "'Montserrat', sans-serif",
-          }
-        },
-        title: {
-          display: true,
-          text: 'Score (%)',
-          font: {
-            size: isMobile ? 12 : 15,
-            weight: 'bold',
-            family: "'Montserrat', sans-serif",
-          }
+          },
+          color: theme.palette.text.secondary,
+          stepSize: 10
         },
         grid: {
           drawTicks: false,
-          drawBorder: false,
+          color: theme.palette.mode === 'dark' 
+            ? 'rgba(255,255,255,0.05)' 
+            : 'rgba(0,0,0,0.05)'
+        },
+        afterFit: (axis) => {
+          axis.paddingRight = 25; // Ensure space for 100% labels
         }
       },
-      y: {
-        display: false,
-        grid: {
-          display: false,
+      y: { 
+        ticks: {
+          font: {
+            size: isMobile ? 14 : 16,
+            family: "'Montserrat', sans-serif",
+            weight: 600
+          },
+          color: theme.palette.text.primary,
+          padding: 10,
+          callback: (value) => {
+            const label = chartData.labels[value];
+            if (isMobile) {
+              return label?.length > 18 ? `${label.substring(0, 15)}...` : label;
+            }
+            return label;
+          }
         },
-        afterFit: (scale) => {
-          scale.height = (barHeight + barSpacing) * sortedData.length - barSpacing;
+        grid: { display: false },
+        afterFit: (axis) => {
+          axis.width = isMobile ? 200 : 250; // Fixed width for perfect centering
         }
       }
-    },
-    onHover: (event, chartElement) => {
-      event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
-    }
-  };
-
-  const externalLabelsPlugin = {
-    id: 'externalLabels',
-    afterDatasetsDraw(chart) {
-      const { ctx, chartArea: { left }, scales: { y } } = chart;
-      ctx.save();
-      ctx.font = `bold ${isMobile ? 10 : 13}px 'Montserrat', sans-serif`;
-      ctx.textBaseline = 'middle';
-
-      chart.data.labels.forEach((label, index) => {
-        const yPos = y.getPixelForValue(index);
-
-        ctx.textAlign = 'right';
-        ctx.fillStyle = theme.palette.text.primary;
-        ctx.fillText(label, left - 10, yPos);
-
-        const score = chart.data.datasets[0].data[index];
-        const barEndX = chart.getDatasetMeta(0).data[index].x;
-        ctx.textAlign = 'left';
-        ctx.fillText(`${score}%`, barEndX + 8, yPos);
-      });
-
-      ctx.restore();
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Box
-        sx={{
+    <Box
+      data-export-container
+      ref={containerRef}
+      sx={{
+        width: '100%',
+        height: '100%',
+        overflow: 'auto',
+        p: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        '& > div': {
           width: '100%',
-          height: {
-            xs: '70vh',
-            sm: '75vh',
-            md: '80vh'
-          },
-          background: theme.palette.background.default,
-          borderRadius: 3,
-          boxShadow: theme.shadows[3],
-          padding: { xs: 2, sm: 3 },
-          overflow: 'hidden',
-          border: `1px solid ${theme.palette.divider}`,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Box
-          ref={containerRef}
-          data-export-container
-          sx={{
-            flex: 1,
-            width: '100%',
-            overflow: 'auto',
-            '&::-webkit-scrollbar': {
-              width: 10,
-              height: 10,
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: theme.palette.primary.main,
-              borderRadius: 4,
-              border: `1px solid ${theme.palette.primary.contrastText}`
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.05)'
-                : 'rgba(0,0,0,0.05)',
-              borderRadius: 4
-            },
-            '&::-webkit-scrollbar-corner': {
-              background: 'transparent'
-            }
-          }}
-        >
-          <Box
-            sx={{
-              minHeight: `${chartHeight}px`,
-              minWidth: `${nameAreaWidth + 600}px`,
-              position: 'relative',
-              paddingBottom: '20px'
-            }}
-          >
-            <Bar
-              ref={chartRef}
-              data={chartData}
-              options={options}
-              plugins={[externalLabelsPlugin]}
-            />
-          </Box>
-        </Box>
-      </Box>
-    </motion.div>
+          minWidth: isMobile ? '100%' : '850px',
+          margin: '0 auto !important',
+          minHeight: Math.max(sortedData.length * 45, 550),
+        }
+      }}
+    >
+      <Bar
+        ref={chartRef}
+        data={chartData}
+        options={options}
+        plugins={[percentagePlugin]}
+      />
+    </Box>
   );
 };
 
