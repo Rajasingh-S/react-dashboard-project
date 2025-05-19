@@ -3,14 +3,12 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 export const PDFExportManager = {
-  async captureFullContent(element) {
+  async captureFullContent(element, title) {
     const originalStyles = {
       overflow: element.style.overflow,
       height: element.style.height,
       width: element.style.width,
       position: element.style.position,
-      top: element.style.top,
-      left: element.style.left,
     };
 
     Object.assign(element.style, {
@@ -34,27 +32,51 @@ export const PDFExportManager = {
     });
 
     Object.assign(element.style, originalStyles);
-    return canvas;
+    return { canvas, title };
   },
 
-  async generatePDF(canvas, title, isLandscape) {
+  async generatePDF({ canvas, title }, isLandscape = true) {
     const pdf = new jsPDF({
       orientation: isLandscape ? 'l' : 'p',
-      unit: 'px',
-      format: [canvas.width, canvas.height],
-      hotfixes: ['px_scaling']
+      unit: 'mm',
+      format: 'a4'
     });
 
-    const imgProps = pdf.getImageProperties(canvas);
-    pdf.addImage(canvas, 'PNG', 0, 0, imgProps.width, imgProps.height);
-    pdf.setProperties({ title });
+    // Calculate dimensions to fit A4
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(
+      (pageWidth - 20) / canvas.width,
+      (pageHeight - 40) / canvas.height
+    );
+    const imgWidth = canvas.width * ratio;
+    const imgHeight = canvas.height * ratio;
+    const x = (pageWidth - imgWidth) / 2;
+    const y = 15; // Top margin
+
+    // Add title
+    pdf.setFontSize(16);
+    pdf.setTextColor(40);
+    pdf.text(title, pageWidth / 2, 10, { align: 'center' });
+
+    // Add content
+    pdf.addImage(canvas, 'PNG', x, y, imgWidth, imgHeight);
+
+    // Add footer
+    const date = new Date().toLocaleDateString();
+    pdf.setFontSize(10);
+    pdf.setTextColor(150);
+    pdf.text(`Exported on ${date}`, pageWidth - 15, pageHeight - 10, {
+      align: 'right'
+    });
+
     return pdf;
   },
 
   handleMobileViewport() {
     const viewportMeta = document.querySelector('meta[name="viewport"]');
     const originalViewport = viewportMeta?.content || '';
-    viewportMeta?.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+    viewportMeta?.setAttribute('content', 'width=1200, initial-scale=1.0');
     return () => viewportMeta?.setAttribute('content', originalViewport);
   }
 };

@@ -1,20 +1,11 @@
 // D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
 import React, { useState, useRef, useMemo } from 'react';
 import {
-  Box,
-  Typography,
-  Paper,
-  Avatar,
-  Button,
-  useTheme,
-  IconButton,
-  FormControl,
-  Select,
-  MenuItem,
-  useMediaQuery,
-  LinearProgress
+  Box, Typography, Paper, Avatar, Button, useTheme, IconButton,
+  FormControl, Select, MenuItem, useMediaQuery, LinearProgress,
+  Stack, ButtonGroup
 } from '@mui/material';
-import { FiDownload, FiPieChart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiDownload, FiPieChart, FiChevronLeft, FiChevronRight, FiArrowLeft } from 'react-icons/fi';
 import { usePromiseTracker, trackPromise } from 'react-promise-tracker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PDFExportManager } from '../../utils/pdfExport';
@@ -30,6 +21,8 @@ const ChartView = ({ data, onToggleView }) => {
   const [currentChart, setCurrentChart] = useState(0);
   const [selectedManager, setSelectedManager] = useState('All Managers');
   const chartRefs = useRef([]);
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const isTablet = useMediaQuery('(max-width:900px)');
 
   const managers = useMemo(() => [
     'All Managers',
@@ -37,8 +30,8 @@ const ChartView = ({ data, onToggleView }) => {
   ], [data]);
 
   const filteredData = useMemo(() => (
-    selectedManager === 'All Managers' 
-      ? data 
+    selectedManager === 'All Managers'
+      ? data
       : data.filter(item => (item.Manager?.trim() || 'Unknown') === selectedManager)
   ), [data, selectedManager]);
 
@@ -59,17 +52,19 @@ const ChartView = ({ data, onToggleView }) => {
       const cleanupViewport = PDFExportManager.handleMobileViewport();
       const exportContainer = chartComponent.querySelector('[data-export-container]');
 
-      const canvas = await trackPromise(
-        PDFExportManager.captureFullContent(exportContainer || chartComponent)
+      const { canvas, title } = await trackPromise(
+        PDFExportManager.captureFullContent(
+          exportContainer || chartComponent,
+          charts[chartIndex].title
+        )
       );
 
       const pdf = await PDFExportManager.generatePDF(
-        canvas,
-        charts[chartIndex].title,
-        chartIndex !== 4
+        { canvas, title },
+        chartIndex !== 4 // Portrait for IntegrityTable
       );
 
-      pdf.save(`${charts[chartIndex].title.replace(/[^\w]/g, '_')}.pdf`);
+      pdf.save(`${title.replace(/[^\w]/g, '_')}.pdf`);
       cleanupViewport();
     } catch (error) {
       console.error('PDF Export Error:', error);
@@ -84,7 +79,7 @@ const ChartView = ({ data, onToggleView }) => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100vh', overflow: 'hidden', position: 'relative' }}>
+    <Box sx={{ p: isMobile ? 1 : 3, height: '100vh', overflow: 'hidden', position: 'relative' }}>
       <AnimatePresence>
         {promiseInProgress && (
           <Box sx={{
@@ -107,25 +102,42 @@ const ChartView = ({ data, onToggleView }) => {
         )}
       </AnimatePresence>
 
+      {/* Responsive Header Section */}
       <Box sx={{
         display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        mb: 3,
-        gap: 2,
-        flexWrap: 'wrap'
+        alignItems: isMobile ? 'flex-start' : 'center',
+        mb: 2,
+        gap: 2
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar sx={{ bgcolor: 'primary.main' }}>
-            <FiPieChart />
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 2,
+          width: isMobile ? '100%' : 'auto'
+        }}>
+          <Avatar sx={{ 
+            bgcolor: 'primary.main',
+            width: isMobile ? 36 : 48,
+            height: isMobile ? 36 : 48
+          }}>
+            <FiPieChart size={isMobile ? 18 : 24} />
           </Avatar>
-          <Typography variant="h5" fontWeight="bold">
+          <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight="bold" noWrap>
             {charts[currentChart].title}
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <FormControl size="small" sx={{ minWidth: 180 }}>
+        <Stack 
+          direction={isMobile ? 'column' : 'row'} 
+          spacing={1}
+          sx={{ 
+            width: isMobile ? '100%' : 'auto',
+            '& .MuiFormControl-root': { width: isMobile ? '100%' : 180 }
+          }}
+        >
+          <FormControl size="small">
             <Select
               value={selectedManager}
               onChange={(e) => setSelectedManager(e.target.value)}
@@ -136,33 +148,45 @@ const ChartView = ({ data, onToggleView }) => {
               }}
             >
               {managers.map(manager => (
-                <MenuItem key={manager} value={manager}>{manager}</MenuItem>
+                <MenuItem key={manager} value={manager}>
+                  {isMobile ? manager.substring(0, 15) + (manager.length > 15 ? '...' : '') : manager}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
           
-          <Button
-            variant="contained"
-            startIcon={<FiDownload />}
-            onClick={handleDownloadPDF}
-            sx={{ textTransform: 'none' }}
-          >
-            Export PDF
-          </Button>
-          
-          <Button
-            variant="outlined"
-            onClick={onToggleView}
-            sx={{ textTransform: 'none' }}
-          >
-            Back to Table
-          </Button>
-        </Box>
+          <ButtonGroup fullWidth={isMobile} sx={{ gap: 1 }}>
+            <Button
+              variant="contained"
+              startIcon={<FiDownload size={18} />}
+              onClick={handleDownloadPDF}
+              sx={{ 
+                textTransform: 'none',
+                flex: isMobile ? 1 : 'none'
+              }}
+            >
+              {isMobile ? 'PDF' : 'Export PDF'}
+            </Button>
+            
+            <Button
+              variant="outlined"
+              startIcon={<FiArrowLeft size={18} />}
+              onClick={onToggleView}
+              sx={{ 
+                textTransform: 'none',
+                flex: isMobile ? 1 : 'none'
+              }}
+            >
+              {isMobile ? 'Table' : 'Back to Table'}
+            </Button>
+          </ButtonGroup>
+        </Stack>
       </Box>
 
+      {/* Charts Container */}
       <Paper elevation={3} sx={{
         width: '100%',
-        height: 'calc(100vh - 180px)',
+        height: isMobile ? 'calc(100vh - 160px)' : 'calc(100vh - 180px)',
         borderRadius: theme.shape.borderRadius,
         boxShadow: theme.shadows[4],
         backgroundColor: theme.palette.background.paper,
@@ -185,7 +209,7 @@ const ChartView = ({ data, onToggleView }) => {
                 height: '100%',
                 left: `${(index - currentChart) * 100}%`,
                 transition: 'left 0.3s ease',
-                p: 2
+                p: isMobile ? 1 : 2
               }}
             >
               {chart.component}
@@ -193,6 +217,7 @@ const ChartView = ({ data, onToggleView }) => {
           ))}
         </Box>
 
+        {/* Navigation Dots */}
         <Box sx={{
           position: 'absolute',
           bottom: 16,
@@ -205,8 +230,8 @@ const ChartView = ({ data, onToggleView }) => {
             <Box
               key={index}
               sx={{
-                width: 12,
-                height: 12,
+                width: 10,
+                height: 10,
                 borderRadius: '50%',
                 bgcolor: currentChart === index ? 'primary.main' : 'action.disabled',
                 cursor: 'pointer',
@@ -217,15 +242,30 @@ const ChartView = ({ data, onToggleView }) => {
           ))}
         </Box>
 
+        {/* Navigation Arrows */}
         <IconButton
           onClick={() => navigateChart('prev')}
-          sx={{ position: 'absolute', left: 16, top: '50%' }}
+          sx={{ 
+            position: 'absolute', 
+            left: 8, 
+            top: '50%',
+            bgcolor: 'background.paper',
+            boxShadow: 1,
+            '&:hover': { bgcolor: 'action.hover' }
+          }}
         >
           <FiChevronLeft />
         </IconButton>
         <IconButton
           onClick={() => navigateChart('next')}
-          sx={{ position: 'absolute', right: 16, top: '50%' }}
+          sx={{ 
+            position: 'absolute', 
+            right: 8, 
+            top: '50%',
+            bgcolor: 'background.paper',
+            boxShadow: 1,
+            '&:hover': { bgcolor: 'action.hover' }
+          }}
         >
           <FiChevronRight />
         </IconButton>
