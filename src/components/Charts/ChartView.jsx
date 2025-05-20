@@ -1,14 +1,15 @@
 // D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
   Box, Typography, Paper, Avatar, Button, useTheme, IconButton,
   FormControl, Select, MenuItem, useMediaQuery, LinearProgress,
   Stack, ButtonGroup
 } from '@mui/material';
-import { FiDownload, FiPieChart, FiChevronLeft, FiChevronRight, FiArrowLeft } from 'react-icons/fi';
+import { FiDownload, FiPieChart, FiChevronLeft, FiChevronRight, FiArrowLeft, FiDownloadCloud } from 'react-icons/fi';
 import { usePromiseTracker, trackPromise } from 'react-promise-tracker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PDFExportManager } from '../../utils/pdfExport';
+import { jsPDF } from 'jspdf';
 import ScoreChart from './ScoreChart';
 import SelfInterestChart from './SelfInterestChart';
 import AbsenteeHeatmap from './AbsenteeHeatmap';
@@ -19,6 +20,7 @@ const ChartView = ({ data, onToggleView }) => {
   const theme = useTheme();
   const { promiseInProgress } = usePromiseTracker();
   const [currentChart, setCurrentChart] = useState(0);
+  const [originalChartIndex, setOriginalChartIndex] = useState(0);
   const [selectedManager, setSelectedManager] = useState('All Managers');
   const chartRefs = useRef([]);
   const isMobile = useMediaQuery('(max-width:600px)');
@@ -42,6 +44,14 @@ const ChartView = ({ data, onToggleView }) => {
     { title: 'Attendance by Manager', component: <AttendanceChart data={filteredData} /> },
     { title: 'Integrity Scores', component: <IntegrityTable data={filteredData} /> },
   ];
+
+  // Preserve original chart position during exports
+  useEffect(() => {
+    return () => {
+      // Restore original chart position if component unmounts during export
+      setCurrentChart(originalChartIndex);
+    };
+  }, [originalChartIndex]);
 
   const handleDownloadPDF = async () => {
     const chartIndex = currentChart;
@@ -70,6 +80,117 @@ const ChartView = ({ data, onToggleView }) => {
       console.error('PDF Export Error:', error);
     }
   };
+
+ // D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
+const handleDownloadAllCharts = async () => {
+  try {
+    setOriginalChartIndex(currentChart);
+    const cleanupViewport = PDFExportManager.handleMobileViewport();
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    for (let i = 0; i < charts.length; i++) {
+      const chartComponent = chartRefs.current[i];
+      if (!chartComponent) continue;
+
+      // Temporarily show the target chart
+      setCurrentChart(i);
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const exportContainer = chartComponent.querySelector('[data-export-container]');
+      let originalStyles = {};
+      
+      // Special handling for Integrity Table
+      if (i === 4) {
+        originalStyles = {
+          height: exportContainer.style.height,
+          overflow: exportContainer.style.overflow
+        };
+        exportContainer.style.height = 'auto';
+        exportContainer.style.overflow = 'visible';
+      }
+
+      const { canvas, title } = await trackPromise(
+        PDFExportManager.captureFullContent(
+          exportContainer || chartComponent,
+          charts[i].title
+        )
+      );
+
+      // Reset styles after capture
+      if (i === 4) {
+        exportContainer.style.height = originalStyles.height;
+        exportContainer.style.overflow = originalStyles.overflow;
+      }
+
+      // Calculate dimensions with margins
+      const pageWidth = pdf.internal.pageSize.getWidth() - 30;
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      if (i !== 0) pdf.addPage();
+      
+      // Special pagination handling for Integrity Table
+      if (i === 4) {
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let currentPos = 0;
+        let pageCount = 0;
+
+        while (currentPos < imgHeight) {
+          if (pageCount > 0) pdf.addPage();
+          
+          const sectionHeight = Math.min(pageHeight - 40, imgHeight - currentPos);
+          
+          pdf.addImage(
+            canvas,
+            'PNG',
+            15, // x
+            20, // y
+            imgWidth,
+            sectionHeight,
+            undefined,
+            'FAST',
+            0, // source x
+            currentPos, // source y
+            canvas.width,
+            sectionHeight
+          );
+
+          // Add header and footer for each page
+          pdf.setFontSize(16);
+          pdf.setTextColor(40);
+          pdf.text(title, 105, 15, { align: "center" });
+
+          const dateStr = new Date().toLocaleDateString();
+          pdf.setFontSize(10);
+          pdf.setTextColor(150);
+          pdf.text(`Exported on ${dateStr}`, 190, 287, { align: "right" });
+
+          currentPos += sectionHeight;
+          pageCount++;
+        }
+      } else {
+        // Normal image handling for other charts
+        pdf.setFontSize(16);
+        pdf.setTextColor(40);
+        pdf.text(title, 105, 20, { align: "center" });
+        pdf.addImage(canvas, 'PNG', 15, 35, imgWidth, imgHeight);
+
+        // Add footer
+        const dateStr = new Date().toLocaleDateString();
+        pdf.setFontSize(10);
+        pdf.setTextColor(150);
+        pdf.text(`Exported on ${dateStr}`, 190, 287, { align: "right" });
+      }
+    }
+
+    pdf.save('All_Charts_Report.pdf');
+    cleanupViewport();
+    setCurrentChart(originalChartIndex);
+  } catch (error) {
+    console.error('PDF Export Error:', error);
+    setCurrentChart(originalChartIndex);
+  }
+};
 
   const navigateChart = (direction) => {
     const newIndex = direction === 'next' 
@@ -167,6 +288,19 @@ const ChartView = ({ data, onToggleView }) => {
             >
               {isMobile ? 'PDF' : 'Export PDF'}
             </Button>
+
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<FiDownloadCloud size={18} />}
+              onClick={handleDownloadAllCharts}
+              sx={{ 
+                textTransform: 'none',
+                flex: isMobile ? 1 : 'none'
+              }}
+            >
+              {isMobile ? 'All' : 'All Charts'}
+            </Button>
             
             <Button
               variant="outlined"
@@ -209,7 +343,9 @@ const ChartView = ({ data, onToggleView }) => {
                 height: '100%',
                 left: `${(index - currentChart) * 100}%`,
                 transition: 'left 0.3s ease',
-                p: isMobile ? 1 : 2
+                p: isMobile ? 1 : 2,
+                backgroundColor: theme.palette.background.paper,
+                zIndex: currentChart === index ? 1 : 0
               }}
             >
               {chart.component}
@@ -224,7 +360,8 @@ const ChartView = ({ data, onToggleView }) => {
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
-          gap: 1
+          gap: 1,
+          zIndex: 2
         }}>
           {charts.map((_, index) => (
             <Box
@@ -251,6 +388,7 @@ const ChartView = ({ data, onToggleView }) => {
             top: '50%',
             bgcolor: 'background.paper',
             boxShadow: 1,
+            zIndex: 2,
             '&:hover': { bgcolor: 'action.hover' }
           }}
         >
@@ -264,6 +402,7 @@ const ChartView = ({ data, onToggleView }) => {
             top: '50%',
             bgcolor: 'background.paper',
             boxShadow: 1,
+            zIndex: 2,
             '&:hover': { bgcolor: 'action.hover' }
           }}
         >
