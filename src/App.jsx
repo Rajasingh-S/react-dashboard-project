@@ -11,6 +11,8 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<AssessmentData />} />
+           <Route path="/" element={<AssessmentData />} />
+            <Route path="/" element={<AssessmentData />} />
          
         </Routes>
       </div>

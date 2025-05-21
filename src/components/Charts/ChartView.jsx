@@ -45,10 +45,8 @@ const ChartView = ({ data, onToggleView }) => {
     { title: 'Integrity Scores', component: <IntegrityTable data={filteredData} /> },
   ];
 
-  // Preserve original chart position during exports
   useEffect(() => {
     return () => {
-      // Restore original chart position if component unmounts during export
       setCurrentChart(originalChartIndex);
     };
   }, [originalChartIndex]);
@@ -71,7 +69,7 @@ const ChartView = ({ data, onToggleView }) => {
 
       const pdf = await PDFExportManager.generatePDF(
         { canvas, title },
-        chartIndex !== 4 // Portrait for IntegrityTable
+        chartIndex !== 4
       );
 
       pdf.save(`${title.replace(/[^\w]/g, '_')}.pdf`);
@@ -81,116 +79,87 @@ const ChartView = ({ data, onToggleView }) => {
     }
   };
 
- // D:\ICANIO intern\React\dashboard-project\src\components\Charts\ChartView.jsx
-const handleDownloadAllCharts = async () => {
-  try {
-    setOriginalChartIndex(currentChart);
-    const cleanupViewport = PDFExportManager.handleMobileViewport();
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    
-    for (let i = 0; i < charts.length; i++) {
-      const chartComponent = chartRefs.current[i];
-      if (!chartComponent) continue;
-
-      // Temporarily show the target chart
-      setCurrentChart(i);
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const exportContainer = chartComponent.querySelector('[data-export-container]');
-      let originalStyles = {};
+  const handleDownloadAllCharts = async () => {
+    try {
+      setOriginalChartIndex(currentChart);
+      const cleanupViewport = PDFExportManager.handleMobileViewport();
+      const pdf = new jsPDF('p', 'mm', 'a4');
       
-      // Special handling for Integrity Table
-      if (i === 4) {
-        originalStyles = {
-          height: exportContainer.style.height,
-          overflow: exportContainer.style.overflow
-        };
-        exportContainer.style.height = 'auto';
-        exportContainer.style.overflow = 'visible';
-      }
+      for (let i = 0; i < charts.length; i++) {
+        setCurrentChart(i);
+        await new Promise(resolve => setTimeout(resolve, 800));
 
-      const { canvas, title } = await trackPromise(
-        PDFExportManager.captureFullContent(
-          exportContainer || chartComponent,
-          charts[i].title
-        )
-      );
+        const chartComponent = chartRefs.current[i];
+        if (!chartComponent) continue;
 
-      // Reset styles after capture
-      if (i === 4) {
-        exportContainer.style.height = originalStyles.height;
-        exportContainer.style.overflow = originalStyles.overflow;
-      }
-
-      // Calculate dimensions with margins
-      const pageWidth = pdf.internal.pageSize.getWidth() - 30;
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      if (i !== 0) pdf.addPage();
-      
-      // Special pagination handling for Integrity Table
-      if (i === 4) {
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        let currentPos = 0;
-        let pageCount = 0;
-
-        while (currentPos < imgHeight) {
-          if (pageCount > 0) pdf.addPage();
-          
-          const sectionHeight = Math.min(pageHeight - 40, imgHeight - currentPos);
-          
-          pdf.addImage(
-            canvas,
-            'PNG',
-            15, // x
-            20, // y
-            imgWidth,
-            sectionHeight,
-            undefined,
-            'FAST',
-            0, // source x
-            currentPos, // source y
-            canvas.width,
-            sectionHeight
-          );
-
-          // Add header and footer for each page
-          pdf.setFontSize(16);
-          pdf.setTextColor(40);
-          pdf.text(title, 105, 15, { align: "center" });
-
-          const dateStr = new Date().toLocaleDateString();
-          pdf.setFontSize(10);
-          pdf.setTextColor(150);
-          pdf.text(`Exported on ${dateStr}`, 190, 287, { align: "right" });
-
-          currentPos += sectionHeight;
-          pageCount++;
+        const exportContainer = chartComponent.querySelector('[data-export-container]');
+        
+        // Special handling for Integrity Table
+        let originalStyles = {};
+        if (i === 4) {
+          originalStyles = {
+            height: exportContainer.style.height,
+            overflow: exportContainer.style.overflow
+          };
+          exportContainer.style.height = 'auto';
+          exportContainer.style.overflow = 'visible';
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
-      } else {
-        // Normal image handling for other charts
+
+        const { canvas, title } = await trackPromise(
+          PDFExportManager.captureFullContent(
+            exportContainer || chartComponent,
+            charts[i].title,
+            i === 4 // Special flag for Integrity Table
+          )
+        );
+
+        if (i === 4) {
+          exportContainer.style.height = originalStyles.height;
+          exportContainer.style.overflow = originalStyles.overflow;
+        }
+
+        // Smart scaling calculation
+        const pageWidth = pdf.internal.pageSize.getWidth() - 20;
+        const pageHeight = pdf.internal.pageSize.getHeight() - 40;
+        const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+        const imgWidth = canvas.width * ratio * 0.95; // 5% smaller to ensure fit
+        const imgHeight = canvas.height * ratio * 0.95;
+
+        if (i !== 0) pdf.addPage();
+        
         pdf.setFontSize(16);
         pdf.setTextColor(40);
-        pdf.text(title, 105, 20, { align: "center" });
-        pdf.addImage(canvas, 'PNG', 15, 35, imgWidth, imgHeight);
+        pdf.text(title, pdf.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+        
+        // Center vertically with top margin for title
+        const yPosition = Math.max(25, (pdf.internal.pageSize.getHeight() - imgHeight) / 2);
+        pdf.addImage(canvas, 'PNG', 
+          (pdf.internal.pageSize.getWidth() - imgWidth) / 2, 
+          yPosition, 
+          imgWidth, 
+          imgHeight
+        );
 
-        // Add footer
+        // Footer
         const dateStr = new Date().toLocaleDateString();
         pdf.setFontSize(10);
         pdf.setTextColor(150);
-        pdf.text(`Exported on ${dateStr}`, 190, 287, { align: "right" });
+        pdf.text(`Exported on ${dateStr}`, 
+          pdf.internal.pageSize.getWidth() - 10, 
+          pdf.internal.pageSize.getHeight() - 10, 
+          { align: "right" }
+        );
       }
-    }
 
-    pdf.save('All_Charts_Report.pdf');
-    cleanupViewport();
-    setCurrentChart(originalChartIndex);
-  } catch (error) {
-    console.error('PDF Export Error:', error);
-    setCurrentChart(originalChartIndex);
-  }
-};
+      pdf.save('All_Charts_Report.pdf');
+      cleanupViewport();
+      setCurrentChart(originalChartIndex);
+    } catch (error) {
+      console.error('PDF Export Error:', error);
+      setCurrentChart(originalChartIndex);
+    }
+  };
 
   const navigateChart = (direction) => {
     const newIndex = direction === 'next' 
@@ -217,13 +186,12 @@ const handleDownloadAllCharts = async () => {
             flexDirection: 'column',
             color: '#fff'
           }}>
-            <Typography variant="h6" gutterBottom>Generating PDF...</Typography>
+            <Typography variant="h6" gutterBottom>Generating PDF Report...</Typography>
             <LinearProgress sx={{ width: 300, height: 8, borderRadius: 4 }} />
           </Box>
         )}
       </AnimatePresence>
 
-      {/* Responsive Header Section */}
       <Box sx={{
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
@@ -317,7 +285,6 @@ const handleDownloadAllCharts = async () => {
         </Stack>
       </Box>
 
-      {/* Charts Container */}
       <Paper elevation={3} sx={{
         width: '100%',
         height: isMobile ? 'calc(100vh - 160px)' : 'calc(100vh - 180px)',
@@ -353,7 +320,6 @@ const handleDownloadAllCharts = async () => {
           ))}
         </Box>
 
-        {/* Navigation Dots */}
         <Box sx={{
           position: 'absolute',
           bottom: 16,
@@ -379,7 +345,6 @@ const handleDownloadAllCharts = async () => {
           ))}
         </Box>
 
-        {/* Navigation Arrows */}
         <IconButton
           onClick={() => navigateChart('prev')}
           sx={{ 
