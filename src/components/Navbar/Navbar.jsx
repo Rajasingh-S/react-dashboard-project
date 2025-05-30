@@ -32,9 +32,9 @@ const Navbar = () => {
           <img src={logo} alt="Logo" className="logo" />
         </div>
         <nav className="nav-menu">
-          <Link to="/" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
+          {/* <Link to="/" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
             Dashboard
-          </Link>
+          </Link> */}
           <Link to="/institutions" className="nav-link" onClick={() => isMobile && setIsOpen(false)}>
             Institutions
           </Link>

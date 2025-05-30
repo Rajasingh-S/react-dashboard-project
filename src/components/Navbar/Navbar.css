@@ -1,15 +1,19 @@
 .sidebar {
-    width: 280px;
-    background: #ffffff;
-    color: #3a4a6b;
-    padding: 30px 0;
-    transition: all 0.3s ease;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
-    height: 100vh;
-    position: fixed;
-    z-index: 100;
-    border-right: 1px solid #e0e0e0;
-  }
+  width: 280px;
+  background: linear-gradient(135deg,
+  rgb(85, 32, 199), 0%, rgb(217, 216, 226) 100%);
+  color: #cdd1da;
+  padding: 30px 0;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  z-index: 100;
+  border-radius: 35px;
+  border-right: 1px solid #e0e0e0;
+  margin-top:50px ;
+}
   
   .sidebar.mobile {
     transform: translateX(-100%);

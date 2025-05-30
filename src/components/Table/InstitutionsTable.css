@@ -1,0 +1,833 @@
+/* InstitutionsTable.css */
+/* Modern, responsive styling with animations for the InstitutionsTable component */
+body{
+  margin-top:-40px ;
+}
+:root {
+  --primary-color: #061a8d;
+  --primary-light: #3982d6;
+  --primary-dark: #1a12b6;
+  --secondary-color: #2e1196;
+  --success-color: #4caf50;
+  --warning-color: #ffc107;
+  --danger-color: #f44336;
+  --info-color: #2196f3;
+  --text-color: #333;
+  --text-light: #c9b5b5;
+  --text-lighter: #777;
+  --bg-color: #f8f9fa;
+  --bg-light: #ffffff;
+  --bg-dark: #e9ecef;
+  --border-color: #dee2e6;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --transition-speed: 0.3s;
+  
+}
+
+/* Base container styles */
+.institutions-table-container {
+  background-color: var(--bg-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  margin: 2rem auto;
+  max-width: 1400px;
+  overflow: hidden;
+  transition: all var(--transition-speed) ease;
+  margin-top:-20px ;
+}
+
+/* Header styles */
+.table-header {
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.title-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title-with-logo h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Button styles */
+.action-button {
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.export-button {
+  background-color: rgba(76, 201, 240, 0.25);
+}
+
+.clear-button {
+  background-color: rgba(244, 67, 54, 0.25);
+}
+
+.chart-button {
+  background-color: rgba(255, 193, 7, 0.25);
+}
+
+.upload-prompt-button {
+  background-color: var(--primary-light);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+/* Filter styles */
+.filters-container {
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.global-search {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  flex: 1;
+  min-width: 200px;
+  transition: all 0.2s ease;
+}
+
+.global-search:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.search-icon {
+  color: var(--text-lighter);
+  margin-right: 0.5rem;
+}
+
+.global-search input {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  flex: 1;
+  font-size: 0.95rem;
+  outline: none;
+  padding: 0;
+}
+
+.filter-group {
+  min-width: 150px;
+}
+
+.filter-group select {
+  appearance: none;
+  background-color: var(--bg-light);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.filter-group select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+  outline: none;
+}
+
+.column-toggle-button, .clear-filter-button {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.column-toggle-button:hover, .clear-filter-button:hover {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* Column selector styles */
+/* Add this to your InstitutionsTable.css file */
+.column-selector-dropdown {
+  z-index: 1000; /* Higher than the table's z-index */
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  right: 0;
+  margin-top: 5px;
+}
+.column-checkboxes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.checkbox-label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.95rem;
+  gap: 0.5rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+}
+
+/* Chart view styles */
+.chart-view-container {
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+/* Table wrapper styles */
+.table-wrapper {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.table-info {
+  color: var(--text-lighter);
+  display: flex;
+  font-size: 0.9rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.pagination-control {
+  display: flex;
+  align-items: center;
+}
+
+.pagination-control select {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.table-scroll-container {
+  overflow-x: auto;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Table styles */
+.institutions-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.institutions-table thead th {
+  background-color: var(--bg-dark);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 1rem;
+  position: sticky;
+  text-align: left;
+  top: 0;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.institutions-table thead th:first-child {
+  border-top-left-radius: var(--border-radius-md);
+}
+
+.institutions-table thead th:last-child {
+  border-top-right-radius: var(--border-radius-md);
+}
+
+.institutions-table thead th:hover {
+  background-color: #d8dbe2;
+}
+
+.header-content {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.sort-indicator {
+  color: var(--primary-color);
+  display: inline-block;
+  font-weight: 700;
+}
+
+.institutions-table tbody tr {
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.institutions-table tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.institutions-table tbody tr:hover {
+  background-color: #f0f4f8;
+}
+
+.institutions-table td {
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  padding: 0.875rem 1rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.cell-content {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-content:hover {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.no-results {
+  text-align: center;
+  color: var(--text-lighter);
+  font-style: italic;
+}
+
+/* Pagination styles */
+.pagination {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.pagination button {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+  color: white;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination span {
+  color: var(--text-color);
+  font-size: 0.95rem;
+}
+
+/* No data message styles */
+.no-data-message {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.upload-prompt {
+  align-items: center;
+  background-color: var(--bg-light);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem;
+  transition: all var(--transition-speed) ease;
+  width: 100%;
+  max-width: 500px;
+}
+
+.upload-prompt:hover {
+  border-color: var(--primary-light);
+}
+
+.upload-prompt svg {
+  color: var(--primary-light);
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.upload-prompt h3 {
+  color: var(--text-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.upload-prompt p {
+  color: var(--text-lighter);
+  font-size: 1rem;
+  margin: 0 0 1.5rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+  }
+}
+
+/* Responsive styles */
+@media screen and (max-width: 1200px) {
+  .column-checkboxes-container {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .table-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .global-search {
+    width: 100%;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .institutions-table-container {
+    margin: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .table-header {
+    padding: 1rem;
+  }
+  
+  .title-with-logo h2 {
+    font-size: 1.25rem;
+  }
+  
+  .filters-container {
+    padding: 1rem;
+  }
+  
+  .table-wrapper {
+    padding: 1rem;
+  }
+  
+  .upload-prompt {
+    padding: 2rem 1rem;
+  }
+  
+  .column-checkboxes-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-button {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .pagination {
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .title-with-logo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-button {
+    width: 100%;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+/* Additional animation effects */
+.action-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.action-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.action-button:focus:not(:active)::after {
+  animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+/* Enhance table row animations */
+.institutions-table tbody tr {
+  transform-origin: center left;
+  animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Enhance filter interactions */
+.filter-group select, .global-search {
+  transition: all 0.3s ease;
+}
+
+.filter-group select:focus, .global-search:focus-within {
+  transform: translateY(-2px);
+}
+
+/* Enhance chart view transition */
+.chart-view-container {
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Add subtle hover effects to the table container */
+.institutions-table-container:hover {
+  box-shadow: var(--shadow-lg), 0 0 0 5px rgba(67, 97, 238, 0.1);
+}
+
+/* Dropdown for column selector */
+.column-selector-dropdown {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  top: 100%;
+  right: 0;
+  z-index: 100;
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  margin-top: 5px;
+}
+
+/* Label inside dropdown */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 14px;
+}
+
+/* Style the input */
+.checkbox-label input[type="checkbox"] {
+  accent-color: #007bff;
+}
+
+/* Align dropdown within container */
+.filter-group {
+  position: relative;
+}
+
+/* Responsive fix for column toggle dropdown */
+@media (max-width: 768px) {
+  .column-selector-dropdown {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+}
+
+
+
+/* Add these styles to your existing InstitutionsTable.css */
+
+/* Enhanced Button Colors */
+.action-button {
+  /* Base styles remain the same */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Export Button - Green */
+.export-button {
+  background-color: var(--success-color) !important;
+  color: white !important;
+  border: 1px solid var(--success-color) !important;
+}
+
+.export-button:hover {
+  background-color: #43a047 !important;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+/* Clear Button - Red */
+.clear-button {
+  background-color: var(--danger-color) !important;
+  color: white !important;
+  border: 1px solid var(--danger-color) !important;
+}
+
+.clear-button:hover {
+  background-color: #e53935 !important;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+/* Chart Button - Orange */
+.chart-button {
+  background-color: var(--warning-color) !important;
+  color: #333 !important;
+  border: 1px solid var(--warning-color) !important;
+}
+
+.chart-button:hover {
+  background-color: #ffb300 !important;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+/* Upload Button - Blue */
+.upload-prompt-button {
+  background-color: var(--info-color) !important;
+  color: white !important;
+  border: 1px solid var(--info-color) !important;
+}
+
+.upload-prompt-button:hover {
+  background-color: #1e88e5 !important;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+/* Column Toggle Button - Purple */
+.column-toggle-button {
+  background-color: #673ab7 !important;
+  color: white !important;
+  border: 1px solid #673ab7 !important;
+}
+
+.column-toggle-button:hover {
+  background-color: #5e35b1 !important;
+  box-shadow: 0 4px 12px rgba(103, 58, 183, 0.3);
+}
+
+/* Clear Filter Button - Dark Gray */
+.clear-filter-button {
+  background-color: #607d8b !important;
+  color: white !important;
+  border: 1px solid #607d8b !important;
+}
+
+.clear-filter-button:hover {
+  background-color: #546e7a !important;
+  box-shadow: 0 4px 12px rgba(96, 125, 139, 0.3);
+}
+
+/* Pagination Buttons - Light Blue */
+.pagination button:not(:disabled) {
+  background-color: var(--primary-light) !important;
+  color: white !important;
+  border: 1px solid var(--primary-light) !important;
+}
+
+.pagination button:not(:disabled):hover {
+  background-color: var(--primary-color) !important;
+  box-shadow: 0 4px 12px rgba(6, 26, 141, 0.3);
+}
+
+/* Button Animation Enhancements */
+.action-button {
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.action-button:after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform .5s, opacity 1s;
+}
+
+.action-button:active:after {
+  transform: scale(0, 0);
+  opacity: .3;
+  transition: 0s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .action-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .upload-prompt-button {
+    padding: 0.75rem 1rem;
+  }
+}

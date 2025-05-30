@@ -1,7 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Dashboard from './pages/Dashboard';
 import Institutions from './pages/Institutions';
+import  Chart from  './components/Chart/Chartview';
+
+
+
+
 import './App.css';
 
 function App() {
@@ -10,9 +14,10 @@ function App() {
       <div className="app-container">
         <Navbar />
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/institutions" element={<Institutions />} />
+          <Route path="/institutions" element={<Institutions />} /> 
+          <Route path= "/" element={<Chart/>}/>
         </Routes>
+      
       </div>
     </Router>
   );
