@@ -1,4 +1,4 @@
- React, { useRef, useMemo, useEffect, useState } from 'react';
+import React, {useMemo, useEffect, useState } from 'react';
 import { Bar, Pie, Line, Doughnut } from 'react-chartjs-2';
 import './chart.css';
 import {
@@ -16,7 +16,8 @@ import {
 } from 'chart.js';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import { FiDownload, FiChevronLeft, FiChevronRight, FiPrinter } from 'react-icons/fi'
+import { FiDownload, FiChevronLeft, FiChevronRight, FiPrinter } from 'react-icons/fi';
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -152,15 +153,19 @@ const Chartview = () => {
     }
   ];
 
+  // State for filter text input
   const [filterText, setFilterText] = useState('');
+  // Filtered charts based on filterText matching title (case insensitive)
   const filteredCharts = charts.filter(chart =>
     chart.title.toLowerCase().includes(filterText.toLowerCase())
   );
 
+  // Refs for filtered charts
   const chartRefs = useMemo(() => filteredCharts.map(() => React.createRef()), [filteredCharts.length]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [chartsReady, setChartsReady] = useState(false);
 
+  // Reset currentSlide to 0 if filter changes and currentSlide is out of range
   useEffect(() => {
     if (currentSlide >= filteredCharts.length) {
       setCurrentSlide(0);
@@ -190,95 +195,16 @@ const Chartview = () => {
 
   const downloadAllAsPDF = () => {
     const doc = new jsPDF('landscape');
-    const padding = 10;
-    
-    // Add cover page
-    doc.setFontSize(24);
-    doc.text('Assessment Report', doc.internal.pageSize.getWidth() / 2, 50, { align: 'center' });
-    doc.setFontSize(16);
-    doc.text(`Generated on ${new Date().toLocaleDateString()}`, doc.internal.pageSize.getWidth() / 2, 70, { align: 'center' });
-    doc.addPage('landscape');
-    
     filteredCharts.forEach((chart, i) => {
       const chartRef = chartRefs[i]?.current;
       if (!chartRef || !chartRef.canvas) return;
-      
       if (i > 0) doc.addPage('landscape');
-      
-      // Set title
       doc.setFontSize(16);
-      doc.setTextColor(40);
-      doc.text(chart.title, doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
-      
-      // Get canvas and create image
+      doc.text(chart.title, 148, 20, { align: 'center' });
       const canvas = chartRef.canvas;
-      
-      // Create a temporary canvas with higher resolution
-      const tempCanvas = document.createElement('canvas');
-      const scale = 2; // Increase for higher quality (but larger file size)
-      tempCanvas.width = canvas.width * scale;
-      tempCanvas.height = canvas.height * scale;
-      
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.scale(scale, scale);
-      tempCtx.drawImage(canvas, 0, 0);
-      
-      const imgData = tempCanvas.toDataURL('image/png', 1.0);
-      
-      // Calculate dimensions to maintain aspect ratio
-      const maxWidth = doc.internal.pageSize.getWidth() - (padding * 2);
-      const maxHeight = doc.internal.pageSize.getHeight() - 40; // Leave space for title
-      
-      const ratio = Math.min(
-        maxWidth / tempCanvas.width,
-        maxHeight / tempCanvas.height
-      );
-      
-      const width = tempCanvas.width * ratio;
-      const height = tempCanvas.height * ratio;
-      
-      // Center the image
-      const x = (doc.internal.pageSize.getWidth() - width) / 2;
-      const y = 30; // Below title
-      
-      doc.addImage(imgData, 'PNG', x, y, width, height);
-      
-      // Add table data
-      if (chart.data && chart.data.labels && chart.data.datasets) {
-        const headers = ['Label', ...chart.data.datasets.map(ds => ds.label || 'Value')];
-        const data = chart.data.labels.map((label, i) => {
-          const values = chart.data.datasets.map(ds => ds.data[i]);
-          return [label, ...values];
-        });
-        
-        doc.autoTable({
-          head: [headers],
-          body: data,
-          startY: y + height + 10,
-          margin: { left: padding, right: padding },
-          styles: { fontSize: 10 },
-          headStyles: { fillColor: [59, 130, 246] } // Blue color
-        });
-      }
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      doc.addImage(imgData, 'PNG', 20, 30, 250, 120);
     });
-    
-    // Add page numbers
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 20, doc.internal.pageSize.getHeight() - 10);
-    }
-    
-    // Set PDF metadata
-    doc.setProperties({
-      title: 'Assessment Report',
-      subject: 'Student assessment data visualization',
-      author: 'Your Application Name',
-      keywords: 'assessment, charts, report',
-      creator: 'Your Application Name'
-    });
-    
     doc.save('Assessment_Report.pdf');
   };
 
@@ -297,35 +223,6 @@ const Chartview = () => {
     }
   };
 
-  const renderTable = () => {
-    const chart = filteredCharts[currentSlide];
-    if (!chart || !chart.data || !chart.data.labels || !chart.data.datasets) return null;
-
-    const headers = ['Label', ...chart.data.datasets.map(ds => ds.label || 'Value')];
-    const rows = chart.data.labels.map((label, i) => {
-      const values = chart.data.datasets.map(ds => ds.data[i]);
-      return [label, ...values];
-    });
-
-    return (
-      <div className="chart-table-view">
-        <h3>{chart.title} - Table View</h3>
-        <table className="chart-table">
-          <thead>
-            <tr>{headers.map((header, i) => <th key={i}>{header}</th>)}</tr>
-          </thead>
-          <tbody>
-            {rows.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.map((cell, i) => <td key={i}>{cell}</td>)}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
   return (
     <div className="chart-view-container">
       <div className="chart-header">
@@ -336,6 +233,15 @@ const Chartview = () => {
             placeholder="Filter charts by title..."
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
+            style={{
+              marginTop: '0.5rem',
+              height:'50px',
+              padding: '0.4rem 0.6rem',
+              borderRadius: '14px',
+              border: '1px solid #ccc',
+              fontSize: '1rem',
+              width: '300px',
+            }}
           />
         </div>
         <div className="header-actions">
@@ -349,7 +255,12 @@ const Chartview = () => {
       </div>
 
       <div className="chart-display-area">
-        <button onClick={prevSlide} className="nav-btn prev" disabled={filteredCharts.length === 0} aria-label="Previous Chart">
+        <button
+          onClick={prevSlide}
+          className="nav-btn prev"
+          disabled={filteredCharts.length === 0}
+          aria-label="Previous Chart"
+        >
           <FiChevronLeft />
         </button>
 
@@ -360,19 +271,25 @@ const Chartview = () => {
           <div className="slide-counter">
             {filteredCharts.length > 0 ? `${currentSlide + 1} of ${filteredCharts.length}` : '0 of 0'}
           </div>
-
-          {/* Table View Below Chart */}
-          {filteredCharts.length > 0 && renderTable()}
         </div>
 
-        <button onClick={nextSlide} className="nav-btn next" disabled={filteredCharts.length === 0} aria-label="Next Chart">
+        <button
+          onClick={nextSlide}
+          className="nav-btn next"
+          disabled={filteredCharts.length === 0}
+          aria-label="Next Chart"
+        >
           <FiChevronRight />
         </button>
       </div>
 
       <div className="chart-navigation">
         {filteredCharts.map((_, index) => (
-          <button key={index} className={`nav-dot ${index === currentSlide ? 'active' : ''}`} onClick={() => setCurrentSlide(index)} />
+          <button
+            key={index}
+            className={`nav-dot ${index === currentSlide ? 'active' : ''}`}
+            onClick={() => setCurrentSlide(index)}
+          />
         ))}
       </div>
 
